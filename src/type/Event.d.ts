@@ -10,7 +10,7 @@ import {
 } from "./Common";
 
 // EventDataWrapper: イベントデータのラッパー
-interface EventDataWrapper {
+export interface EventDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
   copyright?: string; // 返された結果の著作権表示
@@ -21,7 +21,7 @@ interface EventDataWrapper {
 }
 
 // EventDataContainer: イベントデータコンテナ
-interface EventDataContainer {
+export interface EventDataContainer {
   offset?: number; // 呼び出しの要求されたオフセット（スキップされた結果の数）
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルターセットで利用可能なリソースの総数
@@ -30,7 +30,7 @@ interface EventDataContainer {
 }
 
 // Event: イベントリソース
-interface Event {
+export interface Event {
   id?: number; // イベントリソースの一意のID
   title?: string; // イベントのタイトル
   description?: string; // イベントの説明
@@ -50,7 +50,7 @@ interface Event {
 }
 
 // EventSummary: イベント概要
-interface EventSummary {
+export interface EventSummary {
   resourceURI?: string; // 個々のイベントリソースへのパス
   name?: string; // イベントの名称
 }

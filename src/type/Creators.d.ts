@@ -11,7 +11,7 @@ import {
 } from "./Common";
 
 // CreatorDataWrapper: クリエイターデータのラッパー
-interface CreatorDataWrapper {
+export interface CreatorDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
   copyright?: string; // 返された結果の著作権表示
@@ -22,7 +22,7 @@ interface CreatorDataWrapper {
 }
 
 // CreatorDataContainer: クリエイターデータコンテナ
-interface CreatorDataContainer {
+export interface CreatorDataContainer {
   offset?: number; // 呼び出しの要求されたオフセット（スキップされた結果の数）
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルターセットで利用可能なリソースの総数
@@ -31,7 +31,7 @@ interface CreatorDataContainer {
 }
 
 // Creator: クリエイターリソース
-interface Creator {
+export interface Creator {
   id?: number; // クリエイターリソースの一意のID
   firstName?: string; // クリエイターの名
   middleName?: string; // クリエイターのミドルネーム

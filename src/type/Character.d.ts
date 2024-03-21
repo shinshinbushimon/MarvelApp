@@ -11,7 +11,7 @@ import {
 } from "./Common";
 
 // CharacterDataWrapper: APIの呼び出し結果を包含するオブジェクト
-interface CharacterDataWrapper {
+export interface CharacterDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
   copyright?: string; // 返された結果の著作権表示
@@ -22,7 +22,7 @@ interface CharacterDataWrapper {
 }
 
 // CharacterDataContainer: キャラクター情報のコンテナ
-interface CharacterDataContainer {
+export interface CharacterDataContainer {
   offset?: number; // 呼び出しの要求されたオフセット（スキップされた結果の数）
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルタセットで利用可能なリソースの総数
@@ -31,7 +31,7 @@ interface CharacterDataContainer {
 }
 
 // Character: キャラクターリソース
-interface Character {
+export interface Character {
   id?: number; // キャラクターリソースの一意のID
   name?: string; // キャラクターの名前
   description?: string; // キャラクターの短い説明または伝記

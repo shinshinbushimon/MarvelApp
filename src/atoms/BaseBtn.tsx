@@ -3,7 +3,8 @@ import styled from "styled-components";
 
 interface btnProps {
     children: string,
-    btnColor: string
+    btnColor: string,
+    onClick: () => void
 }
 
 const SButton = styled.button<{ btnColor: string}>`
@@ -23,10 +24,10 @@ const SButton = styled.button<{ btnColor: string}>`
     }
 `;
 
-export const BaseBtn: React.FC<btnProps> = ({children, btnColor}) => {
+export const BaseBtn: React.FC<btnProps> = ({children, btnColor, onClick}) => {
 
     return (
-        <SButton btnColor={ btnColor }>{ children }</SButton>
+        <SButton btnColor={ btnColor } onClick={ onClick }>{ children }</SButton>
     );
 }
 

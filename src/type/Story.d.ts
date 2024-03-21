@@ -11,7 +11,7 @@ import {
 } from "./Common";
 
 // StoryDataWrapper: ストーリーデータのラッパー
-interface StoryDataWrapper {
+export interface StoryDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
   copyright?: string; // 返された結果の著作権表示
@@ -22,7 +22,7 @@ interface StoryDataWrapper {
 }
 
 // StoryDataContainer: ストーリーデータコンテナ
-interface StoryDataContainer {
+export interface StoryDataContainer {
   offset?: number; // 呼び出しの要求されたオフセット（スキップされた結果の数）
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルターセットで利用可能なリソースの総数
@@ -31,7 +31,7 @@ interface StoryDataContainer {
 }
 
 // Story: ストーリーリソース
-interface Story {
+export interface Story {
   id?: number; // ストーリーリソースの一意のID
   title?: string; // ストーリーのタイトル
   description?: string; // ストーリーの短い説明

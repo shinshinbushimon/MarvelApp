@@ -12,7 +12,7 @@ import {
 } from "./Common";
 
 // SeriesDataWrapper: シリーズデータのラッパー
-interface SeriesDataWrapper {
+export interface SeriesDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
   copyright?: string; // 返された結果の著作権表示
@@ -23,7 +23,7 @@ interface SeriesDataWrapper {
 }
 
 // SeriesDataContainer: シリーズデータコンテナ
-interface SeriesDataContainer {
+export interface SeriesDataContainer {
   offset?: number; // 呼び出しの要求されたオフセット（スキップされた結果の数）
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルターセットで利用可能なリソースの総数
@@ -32,7 +32,7 @@ interface SeriesDataContainer {
 }
 
 // Series: シリーズリソース
-interface Series {
+export interface Series {
   id?: number; // シリーズリソースの一意のID
   title?: string; // シリーズの正式タイトル
   description?: string; // シリーズの説明

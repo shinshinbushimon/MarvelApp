@@ -11,7 +11,7 @@ import {
   Url 
 } from "./Common";
 
-interface ComicDataWrapper {
+export interface ComicDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
   copyright?: string; // 返された結果の著作権表示
@@ -22,7 +22,7 @@ interface ComicDataWrapper {
 }
 
 // ComicDataContainer: コミックデータコンテナ
-interface ComicDataContainer {
+export interface ComicDataContainer {
   offset?: number; // 呼び出しの要求されたオフセット（スキップされた結果の数）
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルターセットで利用可能なリソースの総数
@@ -31,7 +31,7 @@ interface ComicDataContainer {
 }
 
 // Comic: コミックリソース
-interface Comic {
+export interface Comic {
   id?: number; // コミックリソースの一意のID
   digitalId?: number; // このコミックのデジタル表現のID。デジタル版が利用不可の場合は0になります。
   title?: string; // コミックの正式タイトル
@@ -64,20 +64,20 @@ interface Comic {
 }
 
 // TextObject: テキストオブジェクト
-interface TextObject {
+export interface TextObject {
   type?: string; // テキストオブジェクトの正式タイプ（例: 勧誘テキスト、プレビューテキストなど）
   language?: string; // テキストオブジェクトが記述されている言語のIETF言語タグ
   text?: string; // テキスト
 }
 
 // ComicDate: コミックの日付
-interface ComicDate {
+export interface ComicDate {
   type?: string; // 日付の説明（例: 発売日、FOC日）
   date?: Date; // 日付
 }
 
 // ComicPrice: コミックの価格
-interface ComicPrice {
+export interface ComicPrice {
   type?: string; // 価格の説明（例: 印刷価格、デジタル価格）
   price?: number; // 価格（全てUSDで表記）
 }
