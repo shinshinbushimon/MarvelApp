@@ -30,13 +30,18 @@ module.exports = {
     module: {
     rules: [
         {
-        test: /\.tsx$/,
+        test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/,
         },
     ],
     },
     resolve: {
+      alias: {
+        'RecoilAtom': path.resolve(__dirname, 'RecoilAtom.ts'),
+        'customHooks': path.resolve(__dirname, 'customHooks.ts'),
+        'src': path.resolve(__dirname, 'src/')
+      },
     extensions: [".ts", ".tsx", ".js"],
     },
     // ワークフロー全体に適応される

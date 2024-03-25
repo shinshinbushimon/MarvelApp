@@ -1,4 +1,5 @@
 import { Character } from "./Character"
+import React from "react";
 
 export interface postType {
     type: string,
@@ -9,9 +10,63 @@ export interface postType {
 export interface pageApiData {
     [page: number]: Character[]
 }
+
 // useReducerの準備
 export interface initialState {
     isLoading: boolean,
     isError: string,
     post: Character[]
+}
+
+export interface btnProps {
+    children: string,
+    btnColor: string,
+    onClick: () => void
+}
+
+export interface InputProps {
+    type: string,
+    placeholder?: string,
+    value?: string,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+export interface CheckInputProps extends InputProps{
+    label: string,
+    checked: boolean,
+}
+
+export interface IconProps {
+    name: string,
+    onClick?: ()=> void
+}
+
+export interface ImageProps {
+    src: string,
+    alt: string
+}
+
+export interface LabelProps {
+    title: string,
+    text?: string
+}
+
+export interface LinkProps {
+    to: string,
+    children: React.ReactNode
+}
+
+export interface SelectProps {
+    options: { value: string; label: string }[];
+    onChange: (event: React.ChangeEvent<HTMLSelectElement>) => void
+}
+
+export interface CheckboxProps {
+    label: string;
+    checked: boolean;
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+}
+
+export interface ListHeaderProps {
+    onSearch: (query: string) => void
 }

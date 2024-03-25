@@ -1,11 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-
-interface btnProps {
-    children: string,
-    btnColor: string,
-    onClick: () => void
-}
+import { btnProps } from "src/type/app";
 
 const SButton = styled.button<{ btnColor: string}>`
     background: ${props => props.btnColor};

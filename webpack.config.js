@@ -1,7 +1,8 @@
 const path = require('path');
 
 module.exports = {
-    
+
+    // 開発用サーバのプロキシ設定    
     entry: './src/app.tsx',
     mode: 'development',
     output: {
@@ -20,6 +21,17 @@ module.exports = {
                 publicPath: "/",
             },
         ],
+        /*
+        proxy: {
+            
+            '/marvel-characters': {
+                target: 'http://localhost:3001',
+                secure: false,
+                changeOrigin: true,
+            }
+            
+        }
+        */
     },
     devtool: "eval",
     module: {
@@ -43,6 +55,12 @@ module.exports = {
         ],
     },
     resolve: {
+        alias: {
+            'RecoilAtom': path.resolve(__dirname, 'RecoilAtom.ts'),
+            'customHooks': path.resolve(__dirname, 'customHooks.ts'),
+            'src': path.resolve(__dirname, 'src/')
+          },
+    
         extensions: [".ts", ".tsx", ".js"],
     }
 }
