@@ -10,6 +10,7 @@ import {
   StoryList, 
   Url 
 } from "./Common";
+import { MarvelElement } from "./Common";
 
 // SeriesDataWrapper: シリーズデータのラッパー
 export interface SeriesDataWrapper {
@@ -32,7 +33,7 @@ export interface SeriesDataContainer {
 }
 
 // Series: シリーズリソース
-export interface Series {
+export interface Series extends MarvelElement {
   id?: number; // シリーズリソースの一意のID
   title?: string; // シリーズの正式タイトル
   description?: string; // シリーズの説明

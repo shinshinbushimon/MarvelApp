@@ -7,7 +7,8 @@ import {
   EventList, 
   Image, 
   SeriesList, 
-  StoryList 
+  StoryList, 
+  MarvelElement
 } from "./Common";
 
 // StoryDataWrapper: ストーリーデータのラッパー
@@ -31,7 +32,7 @@ export interface StoryDataContainer {
 }
 
 // Story: ストーリーリソース
-export interface Story {
+export interface Story extends MarvelElement{
   id?: number; // ストーリーリソースの一意のID
   title?: string; // ストーリーのタイトル
   description?: string; // ストーリーの短い説明

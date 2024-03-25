@@ -1,8 +1,9 @@
 import { atom } from 'recoil';
-import { pageApiData } from 'src/type/app';
+import { Character } from 'src/type/Character';
+import { pageApiData } from 'src/type/app'; 
 
 // pagekeyとapiデータバリューを保持する
-export const MarvelApi = atom<pageApiData>({
+export const MarvelApi = atom<pageApiData<Character>>({
     key: 'MarvelApi',
     default: {}
 });

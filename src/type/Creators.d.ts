@@ -9,6 +9,7 @@ import {
   StoryList, 
   Url 
 } from "./Common";
+import { MarvelElement } from "./Common";
 
 // CreatorDataWrapper: クリエイターデータのラッパー
 export interface CreatorDataWrapper {
@@ -31,7 +32,7 @@ export interface CreatorDataContainer {
 }
 
 // Creator: クリエイターリソース
-export interface Creator {
+export interface Creator extends MarvelElement {
   id?: number; // クリエイターリソースの一意のID
   firstName?: string; // クリエイターの名
   middleName?: string; // クリエイターのミドルネーム

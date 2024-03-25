@@ -1,5 +1,10 @@
 import { Character } from "./Character"
 import React from "react";
+import { Comic } from "./Comic";
+import { Creator } from "./Creators";
+import { Event } from "./Event";
+import { Series } from "./Series";
+import { MarvelElement } from "./Common";
 
 export interface postType {
     type: string,
@@ -7,8 +12,10 @@ export interface postType {
 }
 
 // page毎に変化するAPIのデータ
-export interface pageApiData {
-    [page: number]: Character[]
+export interface pageApiData<T extends MarvelElement> {
+    [category: string]: {
+        [page: number]: T[]
+    }
 }
 
 // useReducerの準備

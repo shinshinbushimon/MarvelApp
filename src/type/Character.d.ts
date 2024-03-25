@@ -9,6 +9,7 @@ import {
   StoryList, 
   Url 
 } from "./Common";
+import { MarvelElement } from "./Common";
 
 // CharacterDataWrapper: APIの呼び出し結果を包含するオブジェクト
 export interface CharacterDataWrapper {
@@ -31,7 +32,7 @@ export interface CharacterDataContainer {
 }
 
 // Character: キャラクターリソース
-export interface Character {
+export interface Character extends MarvelElement {
   id?: number; // キャラクターリソースの一意のID
   name?: string; // キャラクターの名前
   description?: string; // キャラクターの短い説明または伝記

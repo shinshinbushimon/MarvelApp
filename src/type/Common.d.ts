@@ -1,3 +1,18 @@
+
+export interface MarvelElement {
+  id: number,
+  modified: Date,
+  resourceUrl: string,
+  urls: Url[],
+  thumbnail: Image,
+  creators?: CreatorList,
+  characters?: CharacterList,
+  events?: EventList,
+  comics?: ComicList,
+  stories?: StoryList,
+  series?: SeriesList
+}
+
 // Url: URL情報
 export interface Url {
   type?: string; // URLのテキスト識別子
@@ -96,16 +111,4 @@ export interface CharacterSummary {
   resourceURI?: string; // 個々のキャラクターリソースへのパス
   name?: string; // キャラクターのフルネーム
   role?: string; // 親エンティティにおけるキャラクターの役割
-}
-
-// ComicSummary: コミック概要
-export interface ComicSummary {
-  resourceURI?: string; // 個々のコミックリソースへのパス
-  name?: string; // コミックの正式名称
-}
-
-// SeriesSummary: シリーズ概要
-export interface SeriesSummary {
-  resourceURI?: string; // 個々のシリーズリソースへのパス
-  name?: string; // シリーズの正式名称
 }

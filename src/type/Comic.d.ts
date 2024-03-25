@@ -10,7 +10,7 @@ import {
   StoryList, 
   Url 
 } from "./Common";
-
+import { MarvelElement } from "./Common";
 export interface ComicDataWrapper {
   code?: number; // HTTPステータスコード
   status?: string; // 呼び出しステータスの文字列説明
@@ -31,7 +31,7 @@ export interface ComicDataContainer {
 }
 
 // Comic: コミックリソース
-export interface Comic {
+export interface Comic extends MarvelElement {
   id?: number; // コミックリソースの一意のID
   digitalId?: number; // このコミックのデジタル表現のID。デジタル版が利用不可の場合は0になります。
   title?: string; // コミックの正式タイトル

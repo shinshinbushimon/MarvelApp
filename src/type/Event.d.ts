@@ -8,6 +8,7 @@ import {
   SeriesList, 
   StoryList 
 } from "./Common";
+import { MarvelElement } from "./Common";
 
 // EventDataWrapper: イベントデータのラッパー
 export interface EventDataWrapper {
@@ -30,7 +31,7 @@ export interface EventDataContainer {
 }
 
 // Event: イベントリソース
-export interface Event {
+export interface Event extends MarvelElement {
   id?: number; // イベントリソースの一意のID
   title?: string; // イベントのタイトル
   description?: string; // イベントの説明
