@@ -12,10 +12,8 @@ export interface postType {
 }
 
 // page毎に変化するAPIのデータ
-export interface pageApiData<T extends MarvelElement> {
-    [category: string]: {
-        [page: number]: T[]
-    }
+export interface pageApiData {
+   [page: number]: Character[]
 }
 
 // useReducerの準備

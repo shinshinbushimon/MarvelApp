@@ -14,7 +14,7 @@ export const useFetchData = () => {
     useEffect(() => {
         const fetchData = async () => {
             // pageDataに値が無ければとってくる
-            if(!apiData[category] || !apiData[category][pageData]) {
+            if(!apiData[pageData]) {
                 try {
                     const response = await fetch(`http://localhost:3001/marvel-characters?page=${pageData}`);
                     const data = await response.json();
@@ -22,10 +22,7 @@ export const useFetchData = () => {
                     // dataのset, ちなみにオブジェクトがアロー関数内で複数行にわたる場合()でくくらなければならない
                     setApiData((prev) => ({
                         ...prev,
-                        [category]: {
-                            ...prev[category],
-                            [pageData]: data.data.results // カテゴリとページキーを指定してデータを更新
-                        }
+                        [pageData]: data.data.results
                     }));
                 } catch (err) {
                     console.error("ERR", err)

@@ -6,6 +6,7 @@ import { Character } from "./type/Character";
 import { MarvelApi, currentPage } from 'RecoilAtom';
 import { useFetchData } from 'customHooks';
 import { CharacterList } from "./organisms/List/CharacterList";
+import { BrowserRouter } from "react-router-dom";
 
 
 console.log("出力は有効です")
@@ -23,10 +24,10 @@ const App: React.FC = () => {
     // 以降の処理でapiDataを使用
     // recoilの使用
     return (
-        <> 
+        <BrowserRouter> 
             <CharacterList />
             <BaseBtn btnColor="#007bff" onClick={ btnClick }>さらに取得する</BaseBtn>
-        </>
+        </BrowserRouter>
     );
 }
 

@@ -7,10 +7,11 @@ import { Image } from "src/type/Common";
 import styled from "styled-components";
 
 const SCharacterItem = styled.div`
-    diplay: flex;
+    display: flex;
     justiy-content: center;
     align-items: center;
     flex-direction: column;
+    border: 2px solid #000;
 `;
 
 const createImg = (img: Image) => {

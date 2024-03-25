@@ -32,7 +32,7 @@ export interface CharacterDataContainer {
 }
 
 // Character: キャラクターリソース
-export interface Character extends MarvelElement {
+export interface Character{
   id?: number; // キャラクターリソースの一意のID
   name?: string; // キャラクターの名前
   description?: string; // キャラクターの短い説明または伝記
