@@ -6,13 +6,6 @@ import { Character } from "src/type/Character";
 import { Image } from "src/type/Common";
 import styled from "styled-components";
 
-const SCharacterItem = styled.div`
-    display: flex;
-    justiy-content: center;
-    align-items: center;
-    flex-direction: column;
-    border: 2px solid #000;
-`;
 
 const createImg = (img: Image) => {
     return img.path + '.' + img.extension
@@ -35,13 +28,44 @@ export const CharacterItem: React.FC<Character> = ({
     
     return (
         <SCharacterItem>
-            <BaseImage src={createImg(thumbnail)} alt="Marvel Char" />
+            <ImageContainer>
+                <BaseImage src={createImg(thumbnail)} alt="Marvel Char" />
+            </ImageContainer>
+            
             <p>id: {id}</p>
             <p>name: {name}</p>
             <Label title="description: " />
-            <p>{description}</p>
+            <Description>{description}</Description>
             <p>modefied: {modified.toString()}</p>
 
         </SCharacterItem>
     );
 };
+
+const SCharacterItem = styled.div`
+  flex: 1 0 20%; /* flex-grow, flex-shrink, flex-basis */
+  margin: 10px; /* アイテム間のマージン */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 箱影 */
+  border-radius: 8px; /* 角丸 */
+  overflow: hidden; /* 内容がはみ出したら隠す */
+  max-width: 220px; /* 最大幅を制限してアイテムが大きくなりすぎないようにする */
+
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* ホバー時の箱影 */
+  }
+`;
+
+const ImageContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%; /* コンテナの幅を指定 */
+`;
+
+const Description = styled.p`
+  width: 90%; /* 要素の幅を指定 */
+  overflow: hidden; /* 内容がはみ出たら非表示にする */
+  white-space: nowrap; /* テキストを1行にする */
+  text-overflow: ellipsis; /* 内容がオーバーフローしたら省略記号を表示 */
+  margin: 10px 0; /* 上下のマージンを設定 */
+`;
+

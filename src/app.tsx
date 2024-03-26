@@ -7,6 +7,8 @@ import { MarvelApi, currentPage } from 'RecoilAtom';
 import { useFetchData } from 'customHooks';
 import { CharacterList } from "./organisms/List/CharacterList";
 import { BrowserRouter } from "react-router-dom";
+import { Router } from "./RoutesLogic/Router";
+import styled from "styled-components";
 
 
 console.log("出力は有効です")
@@ -24,22 +26,33 @@ const App: React.FC = () => {
     // 以降の処理でapiDataを使用
     // recoilの使用
     return (
-        <BrowserRouter> 
+        <BrowserRouter>
+            <Router />
             <CharacterList />
             <BaseBtn btnColor="#007bff" onClick={ btnClick }>さらに取得する</BaseBtn>
         </BrowserRouter>
     );
 }
 
+const AppContainer = styled.div`
+    background-color: #FFF0DC; /* 薄い肌色 */
+    min-height: 100vh; /* 画面全体を覆う */
+    width: 100%;
+`;
+
 const container = document.getElementById("root")! as HTMLDivElement;
 const root = createRoot(container);
 
 root.render(
     <RecoilRoot>
+        <AppContainer>
         <App />
+        </AppContainer>
+        
     </RecoilRoot>
 
 );
+
 
 /* 
     まずは持っているデータだけでプロトタイプを作ること

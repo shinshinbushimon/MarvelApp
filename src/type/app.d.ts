@@ -75,3 +75,7 @@ export interface CheckboxProps {
 export interface ListHeaderProps {
     onSearch: (query: string) => void
 }
+
+export interface SearchSet {
+    onChange: (value: string) => void
+}
