@@ -77,5 +77,6 @@ export interface ListHeaderProps {
 }
 
 export interface SearchSet {
+    value: string,
     onChange: (value: string) => void
 }

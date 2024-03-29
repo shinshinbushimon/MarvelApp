@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { InputField } from 'src/atoms/Input/BaseInputField';
 import { BaseBtn } from 'src/atoms/Btn/BaseBtn';
 import { SearchSet } from 'src/type/app';
-import { searchStates } from 'RecoilAtom';
+import { searchValue } from 'RecoilAtom';
 import { useRecoilState } from 'recoil';
 
 const SearchBarContainer = styled.div`
@@ -20,27 +20,18 @@ const SearchButton = styled(BaseBtn)`
   margin-left: 10px;
 `;
 
-export const SearchBar: React.FC<SearchSet> = ({}) => {
-  const [searchQuery, setSearchQuery] = useRecoilState(searchStates);
-
-  const handleSearch = () => {
-    console.log("Searching for:", searchQuery);
-    // ここで検索クエリを用いた検索処理を実行
-  };
+// 外から値をもらうものでは？
+export const SearchBar: React.FC<SearchSet> = ({value, onChange}) => {
 
   return (
     <SearchBarContainer>
       <InputField
         type="text"
         placeholder="キーワードを入力..."
-        value={searchQuery["characters"]} 
-        onChange={(e) => setSearchQuery((prev) => ({
-            ...prev,
-            characters: e.target.value
-        }))
-    }
+        value={value} 
+        onChange={(e) => onChange(e.target.value)}
+        
       />
-      <SearchButton btnColor="#007bff" onClick={handleSearch}>検索</SearchButton>
     </SearchBarContainer>
   );
 };

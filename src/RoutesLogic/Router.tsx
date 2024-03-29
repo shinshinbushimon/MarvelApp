@@ -1,17 +1,19 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { CharacterList } from "src/organisms/List/CharacterList";
+import { CharacterDefault } from "src/pages/Detail/CharacterDefault";
 import CharacterDetail from "src/pages/Detail/CharacterDetail";
+import { HomePage } from "src/pages/Home";
 
 export const Router = () => {
     return (
         <Routes>
-            <Route path='/character' element={<CharacterList />} />
+            <Route path='/' element={<HomePage />} />
+            <Route path='/character' element={<CharacterDefault />} />
             <Route path='/character/detail' element={<CharacterDetail />} />
             
         </Routes>
     );
 }
 
-// 
+
 // <Route path='*' element={ <Page404 /> }/>

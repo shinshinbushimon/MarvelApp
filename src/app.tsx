@@ -2,13 +2,12 @@ import React ,{ useState, useReducer, useEffect } from "react";
 import { RecoilRoot, useRecoilValue, useRecoilState } from 'recoil';
 import { createRoot } from "react-dom/client";
 import { BaseBtn } from "./atoms/Btn/BaseBtn";
-import { Character } from "./type/Character";
 import { MarvelApi, currentPage } from 'RecoilAtom';
 import { useFetchData } from 'customHooks';
-import { CharacterList } from "./organisms/List/CharacterList";
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./RoutesLogic/Router";
 import styled from "styled-components";
+import { CharacterDefault } from "./pages/Detail/CharacterDefault";
 
 
 console.log("出力は有効です")
@@ -28,7 +27,6 @@ const App: React.FC = () => {
     return (
         <BrowserRouter>
             <Router />
-            <CharacterList />
             <BaseBtn btnColor="#007bff" onClick={ btnClick }>さらに取得する</BaseBtn>
         </BrowserRouter>
     );
@@ -46,7 +44,7 @@ const root = createRoot(container);
 root.render(
     <RecoilRoot>
         <AppContainer>
-        <App />
+            <App />
         </AppContainer>
         
     </RecoilRoot>

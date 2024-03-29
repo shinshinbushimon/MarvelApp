@@ -3,6 +3,7 @@ const express = require('express')
 const axios = require('axios')
 const md5 = require('md5')
 const cors = require('cors')
+const { MongoClient } = require('mongodb'); // mongoのドライバオブジェクト
 
 
 const app = express();
@@ -23,12 +24,47 @@ app.get('/marvel-characters', async (req, res) => {
     const limit = 20;
     const offset = (page - 1) * limit;
     console.log("get request!!!");
-    const keyParam = generateParam();
-    const baseURL = `http://gateway.marvel.com/v1/public/characters`;
+    const mongoUrl = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/myMarvelDatabase?authSource=admin`;
+    const client = new MongoClient(mongoUrl);
 
     try {
-        const response = await axios.get(`${baseURL}${keyParam}&limit=${limit}&offset=${offset}`);
-        res.json(response.data);
+        await client.connect();
+        const database = client.db('marvel');
+        const characters = database.collection('characters');
+
+        const results = await characters.find({}).skip(offset).limit(limit).toArray();
+        res.json(results);
+    } catch (error) {
+        console.error('API call failed:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// search用で、dbに対して検索の処理
+app.get('/marvel-characters-search', async (req, res) => {
+    // 以下dbデータ取得処理を実行
+    const keyWord = req.query.name || '';
+    
+    console.log("get search request!!!");
+    const mongoUrl = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/myMarvelDatabase?authSource=admin`;
+    const client = new MongoClient(mongoUrl);
+
+    try {
+        console.log(`currentKeyWord is ${keyWord}`)
+        await client.connect();
+        const database = client.db('marvel');
+        const characters = database.collection('characters');
+        // keyWordが空の場合、空の配列を返す
+        if (!keyWord) {
+            res.json([]);
+            return;
+        }
+        
+        const results = await characters.find({
+            name: { $regex: keyWord, $options: 'i' }
+        }).toArray();
+        
+        res.json(results);    
     } catch (error) {
         console.error('API call failed:', error);
         res.status(500).send('Internal Server Error');

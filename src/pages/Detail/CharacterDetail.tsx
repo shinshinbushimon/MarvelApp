@@ -1,20 +1,21 @@
 import React from "react";
 import styled from "styled-components";
-import { Character } from "src/type/Character";
 import { useLocation, useNavigate } from "react-router-dom";
 import { MarvelApi } from "RecoilAtom";
 import { useRecoilValue } from "recoil";
 import { BaseBtn } from "src/atoms/Btn/BaseBtn";
+import { currentPage } from "RecoilAtom";
 
 
 export const CharacterDetail: React.FC = () => {
     const apiData = useRecoilValue(MarvelApi);
     const { search } = useLocation();
     const query = new URLSearchParams(search);
-    const pageData = query.get("page");
+    const pageData = useRecoilValue(currentPage);
     const characterId = query.get("characterId");
 
     const mainData = apiData[pageData].find(character => character.id.toString() === characterId);
+    console.log(mainData);
     const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
     let nav = useNavigate();
     const backBtn = () => nav('/character');
@@ -23,21 +24,21 @@ export const CharacterDetail: React.FC = () => {
     return (
 
         <Container>
-        <ImageContainer>
-            <CharacterImage src={`${thumbnail.path}.${thumbnail.extension}`} alt={name} />
-            <ModifiedDate>Last Modified: {modified}</ModifiedDate>
-        </ImageContainer>
-        <DetailContainer>
-            <CharacterName>{name}</CharacterName>
-            <CharacterDescription>{description}</CharacterDescription>
-            <MoreDetails href={resourceURI} target="_blank" rel="noopener noreferrer">More Details</MoreDetails>
-            <UrlsContainer>
-            {urls.map((url, index) => (
-                <UrlLink key={index} href={url.url} target="_blank" rel="noopener noreferrer">{url.type}</UrlLink>
-            ))}
-            </UrlsContainer>
-            <BaseBtn btnColor="blue" onClick={backBtn}>リストへ戻る</BaseBtn>
-        </DetailContainer>
+          <ImageContainer>
+              <CharacterImage src={`${thumbnail.path}.${thumbnail.extension}`} alt={name} />
+              <ModifiedDate>Last Modified: {modified.toString()}</ModifiedDate>
+          </ImageContainer>
+          <DetailContainer>
+              <CharacterName>{name}</CharacterName>
+              <CharacterDescription>{description}</CharacterDescription>
+              <MoreDetails href={resourceURI} target="_blank" rel="noopener noreferrer">More Details</MoreDetails>
+              <UrlsContainer>
+                {urls.map((url, index) => (
+                    <UrlLink key={index} href={url.url} target="_blank" rel="noopener noreferrer">{url.type}</UrlLink>
+                ))}
+              </UrlsContainer>
+              <BaseBtn btnColor="blue" onClick={backBtn}>リストへ戻る</BaseBtn>
+          </DetailContainer>
         </Container>
   );
 };
