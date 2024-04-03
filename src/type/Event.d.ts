@@ -27,11 +27,11 @@ export interface EventDataContainer {
   limit?: number; // 要求された結果の制限
   total?: number; // 現在のフィルターセットで利用可能なリソースの総数
   count?: number; // この呼び出しによって返された結果の総数
-  results?: Event[]; // 呼び出しによって返されたイベントのリスト
+  results?: Events[]; // 呼び出しによって返されたイベントのリスト
 }
 
 // Event: イベントリソース
-export interface Event extends MarvelElement {
+export interface Events extends MarvelElement {
   id?: number; // イベントリソースの一意のID
   title?: string; // イベントのタイトル
   description?: string; // イベントの説明
@@ -46,7 +46,7 @@ export interface Event extends MarvelElement {
   series?: SeriesList; // このイベントに含まれるシリーズのリソースリスト
   characters?: CharacterList; // このイベントに登場するキャラクターのリソースリスト
   creators?: CreatorList; // このイベントに作品が含まれるクリエイターのリソースリスト
-  next?: EventSummary; // このイベントに続くイベントの要約表現
+  next?: EventsSummary; // このイベントに続くイベントの要約表現
   previous?: EventSummary; // このイベントに先行するイベントの要約表現
 }
 

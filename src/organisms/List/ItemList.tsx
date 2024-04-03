@@ -11,10 +11,10 @@ export const CharacterList: React.FC = () => {
 
 
     return (
-        <CharacterListContainer>
+        <ListContainer>
             {apiData[pageKey] ? 
                 apiData[pageKey].map(character => 
-                    <CustomLink to={`/character/detail/?characterId=${character.id}&page=${pageKey}`}>
+                    <CustomLink to={`/character/detail/?characterId=${character.id}`}>
                         <CharacterItem key={character.id} {...character} />
                     </CustomLink>
                     
@@ -22,11 +22,11 @@ export const CharacterList: React.FC = () => {
                 :
                 (<p>データを取得しています。。。</p>)
             }
-        </CharacterListContainer>
+        </ListContainer>
     );
 }
 
-const CharacterListContainer = styled.div`
+const ListContainer = styled.div`
   display: flex;
   flex-wrap: wrap; /* アイテムがコンテナの幅を超えたら次の行に折り返す */
   justify-content: space-around; /* アイテム間に均等なスペースを設置 */

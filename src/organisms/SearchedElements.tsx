@@ -11,7 +11,7 @@ export const SearchedElements: React.FC = () => {
     return (
         <>
             {searchedItems.length > 0 ? 
-            searchedItems.map((character) => 
+            searchedItems.map((character) =>
                 <CustomLink to={`/character/detail/?characterId=${character.id}`}>
                     <CharacterItemContainer>
                         <CharacterItem key={character.id} {...character} />

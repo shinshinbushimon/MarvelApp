@@ -1,5 +1,5 @@
 import React from "react";
-import { CharacterList } from "src/organisms/List/CharacterList";
+import { CharacterList } from "src/organisms/List/ItemList";
 import { SearchBar } from "src/molecules/searchBar/BaseSearchBar";
 import { searchOutput, searchValue } from "RecoilAtom";
 import { useRecoilState, useRecoilValue } from "recoil";

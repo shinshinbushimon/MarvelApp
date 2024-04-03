@@ -1,24 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { MarvelApi } from "RecoilAtom";
-import { useRecoilValue } from "recoil";
+import { targetCharacterId, targetCharacter, AllScrollData } from "RecoilAtom";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { BaseBtn } from "src/atoms/Btn/BaseBtn";
-import { currentPage } from "RecoilAtom";
+import { InfinityScroll } from "src/organisms/Scroll/InfinityScroll";
+import { useDetailSearch } from "customHooks";
 
+// 各関連要素のコンポーネントに, className=.marvelItemと追記すること
 
 export const CharacterDetail: React.FC = () => {
-    const apiData = useRecoilValue(MarvelApi);
-    const { search } = useLocation();
-    const query = new URLSearchParams(search);
-    const pageData = useRecoilValue(currentPage);
-    const characterId = query.get("characterId");
+  
+  const { search } = useLocation();
+  const query = new URLSearchParams(search);
+  const characterId = Number(query.get("characterId"));
+  console.log("characterId is ", characterId);
 
-    const mainData = apiData[pageData].find(character => character.id.toString() === characterId);
-    console.log(mainData);
-    const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
-    let nav = useNavigate();
-    const backBtn = () => nav('/character');
+  const setId = useSetRecoilState(targetCharacterId);
+  setId(characterId);
+  const isLoading = useDetailSearch();
+  let nav = useNavigate();
+  const backBtn = () => nav('/character');
+  
+  
+  const mainData = useRecoilValue(targetCharacter);
+  /*
+  const comicRef = useInfiniteScroll("comics");
+  useInfiniteScroll("events");
+  useInfiniteScroll("creators");
+  useInfiniteScroll("series");
+  useInfiniteScroll("stories");
+  
+
+  const allData = useRecoilValue(AllScrollData);
+  */
+  if (isLoading) {
+    // ローディング中の場合はローディング表示
+    return <div>Loading...</div>;
+  }
+
+  // データが存在しない場合はローディング表示
+
+  const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
+  // const { comics, events, creators, series, stories } = allData;
+
+
+  // 省略: コンポーネントのレンダリング部分
 
     console.log("queryObjは、", query);
     return (
@@ -37,13 +64,38 @@ export const CharacterDetail: React.FC = () => {
                     <UrlLink key={index} href={url.url} target="_blank" rel="noopener noreferrer">{url.type}</UrlLink>
                 ))}
               </UrlsContainer>
-              <BaseBtn btnColor="blue" onClick={backBtn}>リストへ戻る</BaseBtn>
+              <ItemDataContainer>
+                 {/* コミックスデータをレンダリング */}
+                 <p>Comics: </p>
+                <InfinityScroll dataType="comics" />
+                {/* スクロール監視対象となる要素 */}
+              </ItemDataContainer>
+              <ItemDataContainer>
+                 {/* コミックスデータをレンダリング */}
+                 <p>Event: </p>
+                <InfinityScroll dataType="events" />
+                {/* スクロール監視対象となる要素 */}
+              </ItemDataContainer>
+              <ItemDataContainer>
+                 {/* コミックスデータをレンダリング */}
+                 <p>Series: </p>
+                <InfinityScroll dataType="series" />
+                {/* スクロール監視対象となる要素 */}
+              </ItemDataContainer>
+              <ItemDataContainer>
+                 {/* コミックスデータをレンダリング */}
+                 <p>Stories: </p>
+                <InfinityScroll dataType="stories" />
+                {/* スクロール監視対象となる要素 */}
+              </ItemDataContainer>
+              
+              
+              <button onClick={backBtn}>リストへ戻る</button>
           </DetailContainer>
         </Container>
   );
 };
 
-export default CharacterDetail;
 
 const Container = styled.div`
   display: flex;
@@ -80,6 +132,10 @@ const MoreDetails = styled.a`
 `;
 
 const UrlsContainer = styled.div`
+  margin-top: 10px;
+`;
+
+const ItemDataContainer = styled.div`
   margin-top: 10px;
 `;
 

@@ -7,7 +7,7 @@ import { useFetchData } from 'customHooks';
 import { BrowserRouter } from "react-router-dom";
 import { Router } from "./RoutesLogic/Router";
 import styled from "styled-components";
-import { CharacterDefault } from "./pages/Detail/CharacterDefault";
+import { CharacterDefault } from "./pages/CharacterDefault";
 
 
 console.log("出力は有効です")

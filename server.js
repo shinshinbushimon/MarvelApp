@@ -19,13 +19,35 @@ const generateParam = () => {
     return `?ts=${timestamp}&apikey=${publicKey}&hash=${hash}`;
 }
 
+const createMongoDriver = () => {
+    const mongoUrl = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/myMarvelDatabase?authSource=admin`;
+    return new MongoClient(mongoUrl)
+}
+
+app.get('/marvel-characters/:characterId/:resourceType', async (req, res) => {
+    console.log("get request!!! characterId!!")
+    const offset = req.query.offset;
+    const { characterId, resourceType } = req.params;
+    const keyParam = generateParam();
+    const requestPart = `${characterId}/${resourceType}`;
+    const baseURL = `http://gateway.marvel.com/v1/public/characters/${requestPart}`;
+
+    try {
+        const response = await axios.get(`${baseURL+keyParam}&offset=${offset}`);
+        res.json(response.data);
+    } catch (error) {
+        console.error('API call failed:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 app.get('/marvel-characters', async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = 20;
     const offset = (page - 1) * limit;
     console.log("get request!!!");
-    const mongoUrl = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/myMarvelDatabase?authSource=admin`;
-    const client = new MongoClient(mongoUrl);
+    const client = createMongoDriver();
 
     try {
         await client.connect();
@@ -46,8 +68,7 @@ app.get('/marvel-characters-search', async (req, res) => {
     const keyWord = req.query.name || '';
     
     console.log("get search request!!!");
-    const mongoUrl = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/myMarvelDatabase?authSource=admin`;
-    const client = new MongoClient(mongoUrl);
+    const client = createMongoDriver();
 
     try {
         console.log(`currentKeyWord is ${keyWord}`)
@@ -66,25 +87,43 @@ app.get('/marvel-characters-search', async (req, res) => {
         
         res.json(results);    
     } catch (error) {
-        console.error('API call failed:', error);
+        console.error('Database fetching failed:', error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-app.get('/marvel-characters/:characterId/:resourceType', async (req, res) => {
-    console.log("get request!!! characterId!!")
-    const { characterId, resourceType} = req.params;
-    const keyParam = generateParam();
-    const baseURL = `http://gateway.marvel.com/v1/public/characters/${characterId}${resourceType ? '/' + resourceType : ''}`;
+
+// リスト画面押下で詳細画面を表示するための処理
+app.get(`/marvel-character-detail`, async (req, res) => {
+    // 以下dbデータ取得処理を実行
+    const characterId = Number(req.query.characterId);
+    
+    console.log("get search detail request!!!");
+    const client = createMongoDriver();
 
     try {
-        const response = await axios.get(`${baseURL+keyParam}`);
-        res.json(response.data);
+        console.log(`currentKeyWord is ${characterId}`)
+        await client.connect();
+        const database = client.db('marvel');
+        const characters = database.collection('characters');
+        // characterIdが空の場合、空の配列を返す
+        if (!characterId) {
+            res.json();
+            return;
+        }
+        
+        const results = await characters.findOne({ id: characterId });
+        console.log("resuilts is ", results)
+        
+        res.json(results);    
     } catch (error) {
-        console.error('API call failed:', error);
+        console.error('Database fetching failed:', error);
         res.status(500).send('Internal Server Error');
     }
 });
+
+
+
 
 
 app.listen(port, () => {

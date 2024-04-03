@@ -5,11 +5,9 @@ import { CustomLink } from "src/atoms/Link/BaseLink";
 import { Character } from "src/type/Character";
 import { Image } from "src/type/Common";
 import styled from "styled-components";
+import { createImg } from "customHooks";
 
 
-const createImg = (img: Image) => {
-    return img.path + '.' + img.extension
-}
 
 export const CharacterItem: React.FC<Character> = ({
   id, // キャラクターリソースの一意のID
