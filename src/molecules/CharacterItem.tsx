@@ -9,61 +9,70 @@ import { createImg } from "customHooks";
 
 
 
-export const CharacterItem: React.FC<Character> = ({
-  id, // キャラクターリソースの一意のID
-  name, // キャラクターの名前
-  description, // キャラクターの短い説明または伝記
-  modified, // リソースが最後に変更された日付
-  resourceURI, // このリソースの正規URL識別子
-  urls, // リソースの公開WebサイトURLのセット
-  thumbnail, // このキャラクターの代表画像
-  comics, // このキャラクターを特集するコミックのリソースリスト
-  stories, // このキャラクターが登場するストーリーのリソースリスト
-  events, // このキャラクターが登場するイベントのリソースリスト
-  series, // このキャラクターが登場するシリーズのリソースリスト
-
-}) => {
-    
-    return (
-        <SCharacterItem>
-            <ImageContainer>
-                <BaseImage src={createImg(thumbnail)} alt="Marvel Char" />
-            </ImageContainer>
-            
-            <p>id: {id}</p>
-            <p>name: {name}</p>
-            <Label title="description: " />
-            <Description>{description}</Description>
-            <p>modefied: {modified.toString()}</p>
-
-        </SCharacterItem>
-    );
+export const CharacterItem: React.FC<Character> = ({ name, thumbnail }) => {
+  return (
+      <SCharacterItem>
+          <ImageContainer>
+              <BaseImage src={createImg(thumbnail)} alt={name} />
+          </ImageContainer>
+          <NameContainer>{name}</NameContainer>
+      </SCharacterItem>
+  );
 };
 
 const SCharacterItem = styled.div`
+  display: flex;
+  flex-direction: column; /* 子要素を縦方向に並べる */
+  align-items: center; /* 子要素を中央揃え */
+  justify-content: center; /* 子要素を中央揃え */
   flex: 1 0 20%; /* flex-grow, flex-shrink, flex-basis */
-  margin: 10px; /* アイテム間のマージン */
+  margin: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 箱影 */
   border-radius: 8px; /* 角丸 */
   overflow: hidden; /* 内容がはみ出したら隠す */
-  max-width: 220px; /* 最大幅を制限してアイテムが大きくなりすぎないようにする */
+  max-width: 200px; /* 最大幅を制限 */
+  height: 280px;
+
+  background: linear-gradient(145deg, #fafafa, #eaeaea); /* グラデーション背景 */
+  border: 1px solid #ddd; /* 細いボーダーを追加 */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; /* スムーズなアニメーションのためのトランジションを追加 */
 
   &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* ホバー時の箱影 */
+    transform: scale(1.05); /* ホバー時に少し拡大 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* ホバー時の箱影を強調 */
   }
 `;
 
 const ImageContainer = styled.div`
+  width: 100%; /* コンテナの幅を指定 */
+  height: 70%; /* 画像コンテナの高さを指定 */
+  border-radius: 50%; 
   display: flex;
   justify-content: center;
-  width: 100%; /* コンテナの幅を指定 */
+  align-items: center;
+  img {
+    width: 100%; /* 画像の幅をコンテナに合わせる */
+    height: auto; /* 画像の高さを自動調整してアスペクト比を維持する */
+    object-fit: cover; /* 画像がコンテナに収まるように調整 */
+  }
 `;
 
-const Description = styled.p`
-  width: 90%; /* 要素の幅を指定 */
-  overflow: hidden; /* 内容がはみ出たら非表示にする */
-  white-space: nowrap; /* テキストを1行にする */
+const NameContainer = styled.div`
+  width: 100%; /* 名前コンテナの幅を指定 */
+  height: 50px; /* 名前の高さを固定してテキストの折り返しを可能にする */
+  display: flex;
+  align-items: center; /* 子要素を中央揃え */
+  justify-content: center; /* 子要素を中央揃え */
+  font-size: 1.2em; /* フォントサイズを大きくする */
+  font-weight: bold; /* フォントを太字にする */
+  color: #333; /* 文字色をダークにする */
+  padding: 10px; /* パディングを調整 */
+  overflow: hidden; /* 内容がはみ出したら非表示にする */
   text-overflow: ellipsis; /* 内容がオーバーフローしたら省略記号を表示 */
-  margin: 10px 0; /* 上下のマージンを設定 */
+  white-space: normal; /* テキストを複数行に対応させる */
+  text-align: center; /* テキストを中央揃え */
+  line-height: 1.5; /* 行間を調整 */
+  font-family: 'Open Sans', sans-serif;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 `;
 

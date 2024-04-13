@@ -14,8 +14,8 @@ export const CharacterList: React.FC = () => {
         <ListContainer>
             {apiData[pageKey] ? 
                 apiData[pageKey].map(character => 
-                    <CustomLink to={`/character/detail/?characterId=${character.id}`}>
-                        <CharacterItem key={character.id} {...character} />
+                    <CustomLink key={character.id} to={`/character/detail/?characterId=${character.id}`}>
+                        <CharacterItem {...character} />
                     </CustomLink>
                     
                 )

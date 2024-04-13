@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import { useInputValidation, useVerifyEnteredData } from 'customHooks';
+import { Link, useNavigate } from 'react-router-dom';
+import { hasAcceptedUser, userId } from 'RecoilAtom';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-const HomePageContainer = styled.div`
+const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,7 +14,15 @@ const HomePageContainer = styled.div`
   background-color: #f0f0f0;
 `;
 
-const NavButton = styled(Link)`
+const Input = styled.input`
+  margin-bottom: 20px;
+  padding: 10px;
+  width: 50%;
+  border: 2px solid #007bff;
+  border-radius: 5px;
+`;
+
+const Button = styled(Link)`
   margin: 10px;
   padding: 15px 30px;
   background-color: #007bff;
@@ -25,30 +36,106 @@ const NavButton = styled(Link)`
   }
 `;
 
-const SearchBar = styled.input`
-  margin-bottom: 20px;
-  padding: 10px;
-  width: 50%;
-  border: 2px solid #007bff;
-  border-radius: 5px;
-`;
+// signupボタンのルーティングや処理の実装
+export const SignUpPage = () => {
+  const userIdElement = useInputValidation('');
+  const passwordElement = useInputValidation('');
+  const [authError, setAuthError] = useState<string>(''); // customhooksに渡す
+  const nav = useNavigate();
+  const setUserId = useSetRecoilState(userId);
+  const [useStatus, setUseStatus] = useRecoilState(hasAcceptedUser);
 
-export const HomePage = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const { verifyData, isLoading } = useVerifyEnteredData(setAuthError);  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
 
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
+  const renderingAct = async () => {
+    await verifyData(
+      userIdElement.value, 
+      passwordElement.value, 
+      'new-register', 
+      setUseStatus);
+
+      if(useStatus) {
+        setUserId(userIdElement.value);
+        nav('/character');
+      }
+  }
 
   return (
-    <HomePageContainer>
-      <SearchBar
+    <Container>
+      <h2>Sign Up</h2>
+      <Input
         type="text"
-        placeholder="Search characters, comics, events..."
-        value={searchQuery}
-        onChange={handleSearchChange}
+        placeholder="User ID"
+        value={userIdElement.value}
+        onChange={userIdElement.handleChange}
       />
-      <NavButton to="/character">Characters</NavButton>
-    </HomePageContainer>
+      {userIdElement.error && <p>{userIdElement.error}</p>}
+      <Input
+        type="password"
+        placeholder="Password"
+        value={passwordElement.value}
+        onChange={passwordElement.handleChange}
+      />
+      {passwordElement.error && <p>{passwordElement.error}</p>}
+      {authError && <p>{authError}</p>}
+      <Button as="button" to="/signup" onClick={renderingAct}>Sign Up</Button>
+      <Button to="/login">Already have an account? Log In</Button>
+    </Container>
+  );
+};
+
+
+export const LoginPage = () => {
+  const userIdElement = useInputValidation('');
+  const passwordElement = useInputValidation('');
+  const [authError, setAuthError] = useState<string>('');
+  const nav = useNavigate();
+  const setUserId = useSetRecoilState(userId);
+  const [useStatus, acceptUser] = useRecoilState(hasAcceptedUser);
+  const loginDomain = 'login'
+  const { verifyData, isLoading } = useVerifyEnteredData(setAuthError);  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
+
+
+  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
+  if(useStatus) {
+    setUserId(userIdElement.value);
+    nav('/character');
+  }
+
+  const renderingAct = async () => {
+    await verifyData(
+      userIdElement.value, 
+      passwordElement.value, 
+      loginDomain, 
+      acceptUser);
+      
+      if(useStatus) {
+        setUserId(userIdElement.value);
+        nav('/character');
+      }
+    }
+
+
+  return (
+    <Container>
+      <h2>Log In</h2>
+      <Input
+        type="text"
+        placeholder="User ID"
+        value={userIdElement.value}
+        onChange={userIdElement.handleChange}
+      />
+      {userIdElement.error && <p>{userIdElement.error}</p>}
+      <Input
+        type="password"
+        placeholder="Password"
+        value={passwordElement.value}
+        onChange={passwordElement.handleChange}
+      />
+      {passwordElement.error && <p>{passwordElement.error}</p>}
+      {authError && <p>{authError}</p>}
+      <Button as="button" to="/login" onClick={renderingAct}>Log In</Button>
+      <Button to="/signup">Don't have an account? Sign Up</Button>
+    </Container>
   );
 };

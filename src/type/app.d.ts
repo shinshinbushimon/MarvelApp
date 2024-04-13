@@ -80,3 +80,28 @@ export interface SearchSet {
     value: string,
     onChange: (value: string) => void
 }
+
+export interface ValidationHook {
+    value: string;
+    error: string;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface ServerHasErrorResponse {
+    success: boolean,
+    message: string
+}
+
+export interface ServerSessionResponse {
+    loggedIn: boolean,
+    accountData: string[] 
+}
+
+export interface InitialDataResponse {
+    dataCount?: number
+}
+
+/*
+    お気に入りしたCharacterIdのstring配列で
+    後ほどRecoilAtomで管理
+*/

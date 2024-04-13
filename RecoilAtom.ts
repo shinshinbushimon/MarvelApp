@@ -62,3 +62,38 @@ export const AllScrollData = atom<{
   'stories': []
   }
 });
+
+// 後ほど使うuserId情報
+export const userId = atom<string>({
+  key: "userId",
+  default: ''
+});
+
+// お気に入りたち
+export const favoriteCharacterInfos = atom<number[]>({
+  key: 'favoriteCharacterInfos',
+  default: []
+});
+
+export const hasAcceptedUser = atom<boolean>({
+  key: "HasAcceptedUser",
+  default: false
+});
+
+// loginしたことがあるかどうか
+export const loginStatus = atom<boolean>({
+  key: 'loginStatus',
+  default: undefined
+});
+
+// お気に入りページで使用するデータ
+export const loggedInItem = atom<string[]>({
+  key: 'loggedInItem',
+  default: []
+});
+
+// MongoDBデータ件数
+export const totalDataCountState = atom<number>({
+  key: "totalDataCount",
+  default: undefined
+});

@@ -25,13 +25,3 @@ export const BaseBtn: React.FC<btnProps> = ({children, btnColor, onClick}) => {
         <SButton btnColor={ btnColor } onClick={ onClick }>{ children }</SButton>
     );
 }
-
-
-/*
-const SContainer = styled.div`
-    display: flex;
-    justify-content: center;
-    padding: 2em;
-`;
-
-*/ 

@@ -7,8 +7,8 @@ export const BaseImage: React.FC<ImageProps> = ({src, alt}) => (
 );
 
 const RoundImage = styled.img`
-  width: 100px; /* 画像のサイズを指定 */
-  height: 100px; /* 画像のサイズを指定 */
-  border-radius: 50%; /* 丸くする */
-  object-fit: cover; /* 画像の比率を保ちつつ、指定した領域に合わせる */
+  max-width: 100%; /* 最大幅を100%にする */
+  max-height: 100%; /* 最大高さも100%にする */
+  object-fit: contain; /* 画像がコンテナに収まるようにする */
+  border-radius: 50%; /* 円形にする */
 `;

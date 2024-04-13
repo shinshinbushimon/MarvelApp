@@ -6,6 +6,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { BaseBtn } from "src/atoms/Btn/BaseBtn";
 import { InfinityScroll } from "src/organisms/Scroll/InfinityScroll";
 import { useDetailSearch } from "customHooks";
+import { FavoriteIcon } from "src/atoms/Icon/BaseIcon";
 
 // 各関連要素のコンポーネントに, className=.marvelItemと追記すること
 
@@ -24,26 +25,13 @@ export const CharacterDetail: React.FC = () => {
   
   
   const mainData = useRecoilValue(targetCharacter);
-  /*
-  const comicRef = useInfiniteScroll("comics");
-  useInfiniteScroll("events");
-  useInfiniteScroll("creators");
-  useInfiniteScroll("series");
-  useInfiniteScroll("stories");
-  
-
-  const allData = useRecoilValue(AllScrollData);
-  */
   if (isLoading) {
     // ローディング中の場合はローディング表示
     return <div>Loading...</div>;
   }
 
   // データが存在しない場合はローディング表示
-
   const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
-  // const { comics, events, creators, series, stories } = allData;
-
 
   // 省略: コンポーネントのレンダリング部分
 
@@ -51,6 +39,7 @@ export const CharacterDetail: React.FC = () => {
     return (
 
         <Container>
+          <FavoriteIcon characterId={characterId} />
           <ImageContainer>
               <CharacterImage src={`${thumbnail.path}.${thumbnail.extension}`} alt={name} />
               <ModifiedDate>Last Modified: {modified.toString()}</ModifiedDate>

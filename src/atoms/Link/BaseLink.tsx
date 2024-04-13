@@ -6,6 +6,8 @@ import styled from "styled-components";
 const SLink = styled(Link)`
     display: inline-block;
     transition: transform 0.3s ease;
+    text-decoration: none; /* リンクの下線を取り除く */
+    color: inherit;
 
     &:hover {
         transform: translateX(10px);

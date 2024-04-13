@@ -21,17 +21,14 @@ module.exports = {
                 publicPath: "/",
             },
         ],
-        /*
-        proxy: {
-            
-            '/marvel-characters': {
-                target: 'http://localhost:3001',
-                secure: false,
-                changeOrigin: true,
-            }
-            
-        }
-        */
+        
+        proxy: [
+            {
+              context: ['/first-ope'],
+              target: 'http://localhost:3001',
+            },
+          ],
+        
     },
     devtool: "eval",
     module: {
