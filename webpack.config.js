@@ -7,14 +7,14 @@ module.exports = {
     mode: 'development',
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
-        publicPath: './dist',
+        path: path.resolve(__dirname, 'public'),
+        publicPath: './public',
     },
     devServer: {
         static: [
             {
-                directory: path.resolve(__dirname, 'dist'),
-                publicPath: "/dist",
+                directory: path.resolve(__dirname, 'public'),
+                publicPath: "/",
             },
             {
                 directory: __dirname,

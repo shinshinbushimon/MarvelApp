@@ -1,7 +1,8 @@
 // 本番build用
 
 const path = require('path');
-const CleanPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin }  = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
     // プロジェクトのエントリポイント(tsファイル: ts-loader使っているため)
@@ -10,15 +11,15 @@ module.exports = {
     mode: 'production',
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, 'dist'),
+        path: path.resolve(__dirname, 'public'),
         // root空の相対パスで、メモリに保持されたbundle.jsを参照するため変更が即座に反映
         //publicPath: '/dist', 本番では、最適化ファイルをデプロイするだけなのでこれも不要
     },
     devServer: {
         static: [
           {
-            directory: path.resolve(__dirname, "dist"),
-            publicPath: "/dist",
+            directory: path.resolve(__dirname, "public"),
+            publicPath: "/",
           },
           {
             directory: __dirname,
@@ -46,7 +47,13 @@ module.exports = {
     },
     // ワークフロー全体に適応される
     plugins: [
-        new CleanPlugin.CleanWebpackPlugin(), // 過去のdist配下のファイルを削除するので常に最新化できる
+      new CleanWebpackPlugin(), // 全て消し去る
+      new CopyPlugin({
+        patterns: [
+            { from: 'index.html', to: 'index.html' },
+            { from: 'style.css', to: 'style.css' }
+        ],
+      }),
     ]
 };
 
