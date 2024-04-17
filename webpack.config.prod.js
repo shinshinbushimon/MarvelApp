@@ -1,5 +1,6 @@
 // 本番build用
-
+require('dotenv').config();
+const webpack = require('webpack');
 const path = require('path');
 const { CleanWebpackPlugin }  = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -54,6 +55,9 @@ module.exports = {
             { from: 'style.css', to: 'style.css' }
         ],
       }),
+      new webpack.DefinePlugin({
+        'process.env.REQUEST_URL': JSON.stringify(process.env.SERVER_PROD_URL)
+    })
     ]
 };
 

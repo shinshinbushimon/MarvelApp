@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 const waitTime = 500 // 検索記入欄で遅延させる時間
 type ServerResponse = (ServerHasErrorResponse | ServerSessionResponse);
+const REQUEST_POINT = process.env.REQUEST_URL;
 
 // サーバレスポンスを検証するための型ガード関数
 function isErrorResponse(serverRes: ServerResponse): serverRes is ServerHasErrorResponse {
@@ -30,7 +31,7 @@ export const useHasEverLogin = () => {
         
         const checkLoggin = async () => {
             try {
-                const response = await fetch(`http://localhost:3001/first-ope`); // 初期起動時
+                const response = await fetch(`${REQUEST_POINT}/first-ope`); // 初期起動時
                 const data: ServerResponse = await response.json(); // 一度だけ呼び出し
 
                 if (!response.ok) {
@@ -68,7 +69,7 @@ export const useInitialNumberOfData = () => {
         // この関数はアプリケーションの初期起動時に一度だけ実行される
     const fetchTotalDataCount = async () => {
         try {
-          const response = await fetch('http://localhost:3001/marvel-characters/data-count'); // MongoDBから総データ件数を取得するエンドポイント
+          const response = await fetch(`${REQUEST_POINT}/marvel-characters/data-count`); // MongoDBから総データ件数を取得するエンドポイント
           const data: InitialDataResponse = await response.json();
           setTotalDataCount(data.dataCount); // 取得した総データ件数を設定
         } catch (error) {
@@ -93,7 +94,7 @@ export const useFetchData = () => {
             // pageDataに値が無ければとってくる
             if(!apiData[pageData]) {
                 try {
-                    const response = await fetch(`http://localhost:3001/marvel-characters?page=${pageData}`);
+                    const response = await fetch(`${REQUEST_POINT}/marvel-characters?page=${pageData}`);
                     const data = await response.json();
 
                     // dataのset, ちなみにオブジェクトがアロー関数内で複数行にわたる場合()でくくらなければならない
@@ -119,7 +120,7 @@ export const useSearchOutput = () => {
         const fetchData = async () => {
             if (searchQuery) {
                 const jobId = setTimeout(async () => {
-                    const response = await fetch(`http://localhost:3001/marvel-characters-search?name=${searchQuery}`);
+                    const response = await fetch(`${REQUEST_POINT}/marvel-characters-search?name=${searchQuery}`);
                     setSearchResults(await response.json());
                 }, waitTime);
 
@@ -157,7 +158,7 @@ export const useDetailSearch = () => {
             } else {
                 try {
                     
-                    const response = await fetch(`http://localhost:3001/marvel-character-detail?characterId=${watchingId}`);
+                    const response = await fetch(`${REQUEST_POINT}/marvel-character-detail?characterId=${watchingId}`);
                     const data = await response.json();
                     setCharacterInfo(data);
                 } catch (error) {
@@ -227,7 +228,7 @@ export const useVerifyEnteredData = (setAuthError: (error: string) => void) => {
       console.log("password is: ", password);
 
       try {
-        const response = await fetch(`http://localhost:3001/${targetDomain}`, {
+        const response = await fetch(`${REQUEST_POINT}/${targetDomain}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: userId, password: password}),
@@ -256,7 +257,7 @@ export const createURI = (
     characterId: number, 
     offset: number
 ) => {
-    return `http://localhost:3001/marvel-characters/${characterId}/${dataType}?offset=${offset}`
+    return `${REQUEST_POINT}/marvel-characters/${characterId}/${dataType}?offset=${offset}`
 }
 
 // お気に入りのuserId: characterid配列の組み合わせを格納するカスタムフック
@@ -281,7 +282,7 @@ export const addToFavorites = async (userId: string, characterId: number) => {
 // お気に入りのuserId: characterid配列の組み合わせを削除するカスタムフック
 export const removeFromFavorites = async (userId: string, characterId: number) => {
     try {
-        const response = await fetch('http://localhost:3001/removeFavorites', {
+        const response = await fetch(`${REQUEST_POINT}/removeFavorites`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

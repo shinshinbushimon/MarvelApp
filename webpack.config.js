@@ -1,4 +1,6 @@
 const path = require('path');
+require('dotenv').config();
+const webpack = require('webpack');
 
 module.exports = {
 
@@ -59,5 +61,17 @@ module.exports = {
           },
     
         extensions: [".ts", ".tsx", ".js"],
-    }
+    },
+    plugins: [
+        new CleanWebpackPlugin(), // 全て消し去る
+        new CopyPlugin({
+          patterns: [
+              { from: 'index.html', to: 'index.html' },
+              { from: 'style.css', to: 'style.css' }
+          ],
+        }),
+        new webpack.DefinePlugin({
+          'process.env.REQUEST_URL': JSON.stringify(process.env.SERVER_DEV_URL)
+      })
+    ]
 }
