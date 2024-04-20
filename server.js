@@ -12,7 +12,6 @@ const { validationResult } = require('express-validator');
 // userInfoデータベースのfavoritesコレクションにお気に入りキャラクタの保存
 const marvelDBName = 'marvel';
 const collectionOfChar = 'characters';
-
 const collectionOfFav = 'favorites';
 
 const app = express();
@@ -37,7 +36,7 @@ const generateParam = () => {
 }
 
 const createMongoWords = () => {
-    return `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@localhost:27017/myMarvelDatabase?authSource=admin`;
+    return `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=${ process.env.TLS_CA_FILE }&retryWrites=false`;
 }
 
 const createMongoDriver = () => {
