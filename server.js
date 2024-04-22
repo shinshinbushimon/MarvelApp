@@ -17,14 +17,27 @@ const collectionOfFav = 'favorites';
 const app = express();
 const port = process.env.PORT || 3001; //3001
 
+const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
+
+
 let database; // 今後使いまわすデータベース
 
 async function connectToMongo() {
-    const client = createMongoDriver();
-    await client.connect();
-    database = client.db(marvelDBName);
+    try {
+        // tlsCAFile オプションを指定して接続
+        const client = await MongoClient.connect(mongoUri, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            tls: true,
+            tlsCAFile: tlsCAFilePath // CA証明書のパスを指定
+        });
+        database = client.db(marvelDBName);
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Could not connect to MongoDB', error);
+    }
 }
-
 
 // APIパラメータ生成
 const generateParam = () => {
@@ -35,26 +48,20 @@ const generateParam = () => {
     return `?ts=${timestamp}&apikey=${publicKey}&hash=${hash}`;
 }
 
-const createMongoWords = () => {
-    return `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/?tls=true&tlsCAFile=${ process.env.TLS_CA_FILE }&retryWrites=false`;
-}
 
-const createMongoDriver = () => {
-    const mongoUrl = createMongoWords();
-    return new MongoClient(mongoUrl)
-}
+MongoClient.connect()
 // CORS設定
 const corsOptions = {
     origin: 'http://localhost:8080', // フロントエンドサーバのオリジン
     credentials: true, // 資格情報を含むリクエストを許可
     optionsSuccessStatus: 200 // 一部のレガシーブラウザの対応
-  };
+};
 
 app.use(cors(corsOptions));
 app.use(session({
     secret: 'secretKey', // セッションを安全に保持するための秘密鍵
     store: MongoStore.create({
-        mongoUrl: createMongoWords(),
+        mongoUrl: mongoUri,
         collectionName: 'sessions'
     }),
     resave: false, // セッションが変更されない限りセッションを保存しない
