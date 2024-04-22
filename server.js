@@ -10,7 +10,7 @@ const validateCredentials = require('./ItemValidator'); // validationのパタ�
 const { validationResult } = require('express-validator');
 
 // userInfoデータベースのfavoritesコレクションにお気に入りキャラクタの保存
-const marvelDBName = 'marvel';
+const marvelDBName = 'MarvelAppDatabase';
 const collectionOfChar = 'characters';
 const collectionOfFav = 'favorites';
 
@@ -19,7 +19,7 @@ const port = process.env.PORT || 3001; //3001
 
 const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
 const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
-
+console.log(mongoUri)
 
 let database; // 今後使いまわすデータベース
 
