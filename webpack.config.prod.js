@@ -56,7 +56,9 @@ module.exports = {
         ],
       }),
       new webpack.DefinePlugin({
-        'process.env.REQUEST_URL': JSON.stringify(process.env.SERVER_PROD_URL)
+        'process.env.NODE_ENV': JSON.stringify('production'), 
+        'process.env.REQUEST_URL': JSON.stringify(process.env.SERVER_PROD_URL),
+        'process.env.TLS_CA_FILE': JSON.stringify(process.env.PRODUCTION_TLS_CA_FILE),
     })
     ]
 };

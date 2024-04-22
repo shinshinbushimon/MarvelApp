@@ -16,10 +16,6 @@ function isErrorResponse(serverRes: ServerResponse): serverRes is ServerHasError
     return (serverRes as ServerHasErrorResponse).message !== undefined;
 }
 
-function isServerResponse(serverRes: ServerResponse): serverRes is ServerHasErrorResponse {
-    return (serverRes as ServerHasErrorResponse).message !== undefined;
-}
-
 
 // 初期起動時に行う、ログインされたことがあるかと保存されているユーザ情報の確認
 // useNavigateを適切に使うところから
