@@ -121,3 +121,16 @@ next:
     ・検索ボタン押下で検索入力欄の表示
     ・起動時にfavoritesコレクションからお気に入りキャラidを取得
     ・キャラクター名以外からも検索ができるように
+
+・ローカルのSSHキーを使ってwebserverへ転送するためのコマンド
+scp -i C:\Users\NDO01\OneDrive\デスクトップ\credencials\MarvelTokyoKeyPair.pem public/bundle.js ec2-user@43.206.233.150:/var/www/marvel-project/public
+
+
+const mongoUrl = 
+`mongodb://<username>:<password>@<your-cluster-endpoint>:27017/<database>?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const tlsCAFilePath = 'path/to/your/global-bundle.pem';
+
+let db;
+
+MongoClient.connect(mongoUrl, { tlsCAFile: tlsCAFilePath }, function(err, client) {
+  if (err) throw err;

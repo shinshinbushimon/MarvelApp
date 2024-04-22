@@ -17,7 +17,7 @@ const collectionOfFav = 'favorites';
 const app = express();
 const port = process.env.PORT || 3001; //3001
 
-const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
 const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
 
 
