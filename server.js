@@ -49,7 +49,6 @@ const generateParam = () => {
 }
 
 
-MongoClient.connect()
 // CORS設定
 const corsOptions = {
     origin: 'http://localhost:8080', // フロントエンドサーバのオリジン
