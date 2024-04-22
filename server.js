@@ -17,7 +17,7 @@ const collectionOfFav = 'favorites';
 const app = express();
 const port = process.env.PORT || 3001; //3001
 
-const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&tlsCAFile=${process.env.PRODUCTION_TLS_CA_FILE}&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
 const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
 console.log(mongoUri)
 
@@ -70,6 +70,32 @@ app.use(session({
 
 app.use(express.json());
 
+const winston = require('winston');
+
+// ロガーの設定
+const logger = winston.createLogger({
+    level: 'info',  // ログレベル
+    format: winston.format.combine(
+        winston.format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        winston.format.errors({ stack: true }),
+        winston.format.splat(),
+        winston.format.json()
+    ),
+    transports: [
+        // コンソールへの出力
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
+        }),
+        // ファイルへの出力設定
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
 
 app.get('/marvel-characters/:characterId/:resourceType', async (req, res) => {
     console.log("get request!!! characterId!!")
@@ -114,8 +140,9 @@ app.get('/marvel-characters', async (req, res) => {
 
         const results = await characters.find({}).skip(offset).limit(limit).toArray();
         res.json(results);
+	logger.info(`Successfully retrieved characters for page ${page}`);
     } catch (error) {
-        console.error('API call failed:', error);
+        logger.error('API call failed:', error);
         res.status(500).send('Internal Server Error');
     }
 });
