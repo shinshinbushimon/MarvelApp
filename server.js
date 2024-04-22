@@ -326,9 +326,16 @@ app.get('/first-ope', async (req, res) => {
 
 
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+async function startServer() {
+    try {
+        await connectToMongo(); // 接続が完了するまで待つ
+        console.log('Database connected, starting server...');
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to connect to MongoDB:', error);
+    }
+}
 
-
-connectToMongo(); // Mongoへの接続
+startServer(); // サーバーとDB接続の初期化を行う
