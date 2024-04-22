@@ -17,7 +17,7 @@ const collectionOfFav = 'favorites';
 const app = express();
 const port = process.env.PORT || 3001; //3001
 
-const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
 const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
 
 
@@ -326,9 +326,17 @@ app.get('/first-ope', async (req, res) => {
 
 
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+async function startServer() {
+    try {
+        await connectToMongo(); // 接続が完了するまで待つ
+        console.log('Database connected, starting server...');
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to connect to MongoDB:', error);
+    }
+}
 
 
-connectToMongo(); // Mongoへの接続
+startServer(); // サーバーとDB接続の初期化を行う
