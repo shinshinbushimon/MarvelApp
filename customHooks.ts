@@ -16,6 +16,7 @@ function isErrorResponse(serverRes: ServerResponse): serverRes is ServerHasError
     return (serverRes as ServerHasErrorResponse).message !== undefined;
 }
 
+console.log("Request URI: ", process.env.REQUEST_URL);
 
 // 初期起動時に行う、ログインされたことがあるかと保存されているユーザ情報の確認
 // useNavigateを適切に使うところから

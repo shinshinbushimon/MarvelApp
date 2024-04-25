@@ -17,7 +17,7 @@ const collectionOfFav = 'favorites';
 const app = express();
 const port = process.env.PORT || 3001; //3001
 
-const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&tlsCAFile=${process.env.PRODUCTION_TLS_CA_FILE}&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
 const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
 console.log(mongoUri)
 
@@ -70,6 +70,32 @@ app.use(session({
 
 app.use(express.json());
 
+const winston = require('winston');
+
+// ロガーの設定
+const logger = winston.createLogger({
+    level: 'info',  // ログレベル
+    format: winston.format.combine(
+        winston.format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        winston.format.errors({ stack: true }),
+        winston.format.splat(),
+        winston.format.json()
+    ),
+    transports: [
+        // コンソールへの出力
+        new winston.transports.Console({
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            )
+        }),
+        // ファイルへの出力設定
+        new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'combined.log' })
+    ]
+});
 
 app.get('/marvel-characters/:characterId/:resourceType', async (req, res) => {
     console.log("get request!!! characterId!!")
@@ -108,53 +134,52 @@ app.get('/marvel-characters', async (req, res) => {
     const limit = 20;
     const offset = (page - 1) * limit;
     console.log("get request!!!");
-    
+
     try {
         const characters = database.collection(collectionOfChar);
 
         const results = await characters.find({}).skip(offset).limit(limit).toArray();
         res.json(results);
+        logger.info(`Successfully retrieved characters for page ${page}`);
     } catch (error) {
-        console.error('API call failed:', error);
+        logger.error('API call failed:', error);
         res.status(500).send('Internal Server Error');
     }
 });
-
 
 // search用で、dbに対して検索の処理
 app.get('/marvel-characters-search', async (req, res) => {
     // 以下dbデータ取得処理を実行
     const keyWord = req.query.name || '';
-    
+
     console.log("get search request!!!");
 
     try {
         console.log(`currentKeyWord is ${keyWord}`)
-        
+
         const characters = database.collection(collectionOfChar);
         // keyWordが空の場合、空の配列を返す
         if (!keyWord) {
             res.json([]);
             return;
         }
-        
+
         const results = await characters.find({
             name: { $regex: keyWord, $options: 'i' }
         }).toArray();
-        
-        res.json(results);    
+
+        res.json(results);
     } catch (error) {
         console.error('Database fetching failed:', error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-
 // リスト画面押下で詳細画面を表示するための処理
 app.get(`/marvel-character-detail`, async (req, res) => {
     // 以下dbデータ取得処理を実行
     const characterId = Number(req.query.characterId);
-    
+
     console.log("get search detail request!!!");
 
     try {
@@ -165,11 +190,11 @@ app.get(`/marvel-character-detail`, async (req, res) => {
             res.json();
             return;
         }
-        
+
         const results = await characters.findOne({ id: characterId });
         console.log("resuilts is ", results)
-        
-        res.json(results);    
+
+        res.json(results);
     } catch (error) {
         console.error('Database fetching failed:', error);
         res.status(500).send('Internal Server Error');
@@ -224,7 +249,6 @@ app.post('/session-generate', (req, res) => {
     res.send('session is created successfully');
 });
 
-
 // 新規登録処理（フロント側と同様のバリデーションを実施）
 app.post('/new-register', validateCredentials, (req, res) => {
     console.log('received the register request!!!');
@@ -232,7 +256,7 @@ app.post('/new-register', validateCredentials, (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         const errorMessages = errors.array().map(err => err.msg).join('\n');
-        return res.status(400).json({ 
+        return res.status(400).json({
             success: false,
             message: errorMessages
         });
@@ -242,16 +266,16 @@ app.post('/new-register', validateCredentials, (req, res) => {
     console.log("This message is in server-side");
     console.log("userId is ", userId);
     console.log("password is ", password);
-    
+
     // RDBMSに接続して、userId重複がないか（後ほどRDBMSに対応改修）
     const tempCheck = userId === 'admin' && password === 'password';
     if (!tempCheck) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             success: false,
-            message: "already has that id.." 
+            message: "already has that id.."
         });
     }
-    
+
     req.session.userId = userId; // sessionに格納
     res.json({
         success: true,
@@ -260,14 +284,13 @@ app.post('/new-register', validateCredentials, (req, res) => {
 
 });
 
-
 // ログイン処理（フロント側と同様のバリデーションを実施）
 app.post('/login', validateCredentials, (req, res) => {
     console.log('received the login request!!!');
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             success: false,
             errors: errors.array().toString()
         });
@@ -285,14 +308,13 @@ app.post('/login', validateCredentials, (req, res) => {
 
 });
 
-
 // 初期起動時
 app.get('/first-ope', async (req, res) => {
     console.log("The initial confignition is successfull!!!");
 
     if (req.session.userId) { // sessionにuserIdが存在した場合、Mongoセッションストアからuser情報を取得して
         try {
-            const favoritesCollection = database.collection(collectionOfFav); 
+            const favoritesCollection = database.collection(collectionOfFav);
             const userIdAndFavorite = await favoritesCollection.findOne({ userId: req.session.userId }); // データ構造：userId: characterId[]
 
             if(userIdAndFavorite) { // データのマッピングが存在した場合、
@@ -324,7 +346,6 @@ app.get('/first-ope', async (req, res) => {
 
 
 
-
 async function startServer() {
     try {
         await connectToMongo(); // 接続が完了するまで待つ
@@ -336,5 +357,6 @@ async function startServer() {
         console.error('Failed to connect to MongoDB:', error);
     }
 }
+
 
 startServer(); // サーバーとDB接続の初期化を行う

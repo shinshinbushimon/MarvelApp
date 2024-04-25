@@ -134,3 +134,5 @@ let db;
 
 MongoClient.connect(mongoUrl, { tlsCAFile: tlsCAFilePath }, function(err, client) {
   if (err) throw err;
+
+  
