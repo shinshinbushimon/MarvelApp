@@ -9,6 +9,9 @@ export const FavoriteIcon: React.FC<{characterId: number}> = ({characterId}) => 
   const [isFavorited, setIsFavorited] = useState(false);
   const [favorites, setFavorites] = useRecoilState(favoriteCharacterInfos);
   const userIdNumber = useRecoilValue(userId);
+  const iconProps = {
+    'data-testid': isFavorited ? 'fill-star' : 'outline-star'
+  };
 
   // コンポーネントのマウント時にお気に入り状態を確認
   useEffect(() => {
@@ -30,7 +33,7 @@ export const FavoriteIcon: React.FC<{characterId: number}> = ({characterId}) => 
 
   return (
     <div onClick={toggleFavorite} style={{ cursor: 'pointer' }}>
-      {isFavorited ? <AiFillStar color="yellow" /> : <AiOutlineStar />}
+      {isFavorited ? <AiFillStar color="yellow" {...iconProps}/> : <AiOutlineStar {...iconProps}/>}
     </div>
   );
 };

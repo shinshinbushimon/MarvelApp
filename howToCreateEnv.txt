@@ -126,3 +126,8 @@ const refreshData = async () => {
 };
 
 refreshData();
+
+・次環境構築アクション
+　⇒統合テストを書いて、テスト環境（現在の本番環境）に配置
+　☞本番環境とテスト環境はnode.jsとnginxのコンテナを使用して動作させる
+　☞両者はKubernetesを使用して実装　

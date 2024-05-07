@@ -9,7 +9,7 @@ export const SearchedElements: React.FC = () => {
     const searchedItems = useRecoilValue(searchOutput);
 
     return (
-        <>
+        <div data-testid="searched-elements">
             {searchedItems.length > 0 ? 
             searchedItems.map((character) =>
                 <CustomLink to={`/character/detail/?characterId=${character.id}`}>
@@ -21,7 +21,7 @@ export const SearchedElements: React.FC = () => {
             )
             :
             (<p>データが見つかりませんでした。</p>) }
-        </>
+        </div>
     );
 }
 

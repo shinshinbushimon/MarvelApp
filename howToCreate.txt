@@ -135,4 +135,50 @@ let db;
 MongoClient.connect(mongoUrl, { tlsCAFile: tlsCAFilePath }, function(err, client) {
   if (err) throw err;
 
-  
+
+今日やること：
+環境変数の、MongoDB, API, MySQL接続の際の値設定
+Amazon Linux2023イメージ、mysql, MongoDBを用意できるDockerfileまたはyamlファイルの準備、dataVolumeの設定, MongoDBのテストデータ格納、yamlの接続設定
+動作確認時のコンテナビルド実行コマンド設定と、サーバ動作設定
+機能面の修正
+
+TMDbAPI
+SUMPLE_TMDb_QUERY=https://api.themoviedb.org/3/discover/movie?api_key=YOUR_API_KEY
+&with_genres=28,12,878  // アクション、アドベンチャー、SF
+&with_companies=420  // マーベル・スタジオのID
+&release_date.gte=2008-01-01  // MCUが始まった年
+&release_date.lte=2023-01-01  // 最新の日付まで
+&sort_by=release_date.desc  // 公開日で降順に並べる
+&include_adult=false  // アダルト内容は含まない
+&region=US  // アメリカの映画市場を対象
+&language=en-US  // 言語設定は英語
+
+やること
+DockerDesktopの日本語化
+明日の質問のあぶり出し
+
+・コンテナ開発の動作環境の構築☞完
+・動作確認手順☞開発環境用にビルドして、コンテナを立ち上げて動作確認ができるようにコマンドの設定
+アプリケーションの再定義:
+開発環境の定義:
+本番環境の定義:
+開発環境構築:
+本番環境の構築:
+アプリケーションロジック作成:
+テストスクリプトの作成（開発環境）:
+テストスクリプトの作成（テスト環境）:
+
+
+アプリケーション：
+アプリケーションにアクセス
+　セッションがない場合☞サインイン画面
+　セッションがある場合☞映画が表示される画面
+
+映画画面：
+・ナビバがあり、キャラクター画面と映画とキャラクタ情報を含むお気に入り画面☞お気に入りデータが無ければないと表示
+・MCUの主要な映画が表示される。要素をクリックすると映画に関する特定の情報と登場キャラクタ達が表示される。
+・映画情報のキャラクタかキャラクタ画面の要素押下でキャラクタ詳細画面へ遷移
+・どのページからでも関連の映画情報詳細画面へ戻れる
+・映画情報詳細画面は映画画面へ戻れる
+・キャラクタ以降の詳細画面（コミックなど）からはキャラクタ詳細画面と映画画面の両方へ戻れる。
+・英語になっているところをDeepLAPIで翻訳

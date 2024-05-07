@@ -1,6 +1,8 @@
 const path = require('path');
 require('dotenv').config();
 const webpack = require('webpack');
+const { CleanWebpackPlugin }  = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 
@@ -38,7 +40,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: "ts-loader",
-                exclude: /node_modules/,
+                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)/,
             },
 
             {
@@ -49,7 +51,7 @@ module.exports = {
                         presets: ['@babel/preset-env', '@babel/preset-react'],
                     },
                 },
-                exclude: /node_modules/,
+                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)/,
             },
         ],
     },
@@ -71,7 +73,7 @@ module.exports = {
           ],
         }),
         new webpack.DefinePlugin({
-          'process.env.NODE_ENV': JSON.stringify('devlopment'), 
+          'process.env.NODE_ENV': JSON.stringify('development'), 
           'process.env.REQUEST_URL': JSON.stringify(process.env.SERVER_DEV_URL),
           'process.env.TLS_CA_FILE': JSON.stringify(process.env.DEVLOPMENT_TLS_CA_FILE),
       })

@@ -17,21 +17,32 @@ const collectionOfFav = 'favorites';
 const app = express();
 const port = process.env.PORT || 3001; //3001
 
-const mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@marvelapidocumentdbs2.cbycq6848fnf.ap-northeast-1.docdb.amazonaws.com:27017/${marvelDBName}?tls=true&tlsCAFile=${process.env.PRODUCTION_TLS_CA_FILE}&replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
-const tlsCAFilePath = process.env.PRODUCTION_TLS_CA_FILE;
-console.log(mongoUri)
+let docDBCntPortion = '';
+let mongoUri = process.env.MONGO_URI;
+if (process.env.NODE_ENV === 'production') {
+    docDBCntPortion = `tls=true&tlsCAFile=${process.env.PRODUCTION_TLS_CA_FILE}&`;
+    mongoUri = `mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@${process.env.MONGO_HOST}:27017/${marvelDBName}?${docDBCntPortion}replicaSet=rs0&readPreference=secondaryPreferred&retryWrites=false`;
+
+} else {
+    mongoUri = process.env.MONGO_URI || `mongodb://mongodb:27017/${marvelDBName}`;
+}
+console.log("This is current MongoURL!!! : ", mongoUri);
+
+
+
+let docDbOption = {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    tls: process.env.NODE_ENV === 'production'
+}
+
 
 let database; // 今後使いまわすデータベース
 
 async function connectToMongo() {
     try {
         // tlsCAFile オプションを指定して接続
-        const client = await MongoClient.connect(mongoUri, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            tls: true,
-            tlsCAFile: tlsCAFilePath // CA証明書のパスを指定
-        });
+        const client = await MongoClient.connect(mongoUri, docDbOption);
         database = client.db(marvelDBName);
         console.log('Connected to MongoDB');
     } catch (error) {

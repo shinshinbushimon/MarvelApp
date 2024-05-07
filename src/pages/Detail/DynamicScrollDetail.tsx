@@ -6,7 +6,7 @@ import { SeriesDetail } from "src/pages/Detail/SeriesDetail";
 import { StoryDetail } from "src/pages/Detail/StoryDetail";
 import { NotFound } from "../NotFound";
 
-export const DynamicScrollDetail: React.FC = () => {
+const DynamicScrollDetail: React.FC = () => {
   const { dataType } = useParams();
   const { search } = useLocation();
   const query = new URLSearchParams(search);

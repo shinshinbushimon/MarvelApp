@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  app-test:
+    container_name: marvel_testing_container
+    image: marvel_testing_image
+    build:
+      context: ./
+      dockerfile: Dockerfile.test
+    volumes:
+      - ./src:/app/src
+      - ./.env:/app/.env
+      - ./customHooks.ts:/app/customHooks.ts
+      - ./ItemValidator.js:/app/ItemValidator.js
+      - ./jest.config.js:/app/jest.config.js
+      - ./jest.setup.ts:/app/jest.setup.ts
+      - ./RecoilAtom.ts:/app/RecoilAtom.ts
+      - ./server.js:/app/server.js
+      - ./tsconfig.json:/app/tsconfig.json
+    command: npm run test

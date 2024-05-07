@@ -25,18 +25,23 @@ const SearchButton = styled(BaseBtn)`
 `;
 
 // 外から値をもらうものでは？
-export const SearchBar: React.FC<SearchSet> = ({value, onChange}) => {
+export const SearchBar: React.FC<SearchSet> = ({ value, onChange }) => {
+  const [searchState, setSearchState] = useState<boolean>(false);
 
   return (
     <SearchBarContainer>
-      <InputField
-        type="text"
-        placeholder="キーワードを入力..."
-        value={value} 
-        onChange={(e) => onChange(e.target.value)}
-        
-      />
-      <SearchButton btnColor='' onClick={() => console.log("clicknow")}>
+      {searchState && (
+        <InputField
+          type="text"
+          placeholder="キーワードを入力..."
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      )}
+      <SearchButton 
+        btnColor='' 
+        onClick={() => setSearchState(currentState => !currentState)}
+      >
         🔍
       </SearchButton>
     </SearchBarContainer>

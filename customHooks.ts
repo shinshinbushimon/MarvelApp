@@ -7,6 +7,14 @@ import { ComicDataContainer } from 'src/type/Comic';
 import { ValidationHook, ServerHasErrorResponse, ServerSessionResponse, InitialDataResponse } from 'src/type/app';
 import { useNavigate } from 'react-router-dom';
 
+if(process.env.NODE_ENV === 'development') {
+    console.log('これは開発環境用のビルドです。')
+} else if (process.env.NODE_ENV === 'production') {
+    console.log('これは本番環境用のビルドです。')
+} else {
+    console.log('これはどちらでもありません');
+}
+
 const waitTime = 500 // 検索記入欄で遅延させる時間
 type ServerResponse = (ServerHasErrorResponse | ServerSessionResponse);
 const REQUEST_POINT = process.env.REQUEST_URL;

@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  app-server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: app-dev-server:v0.0.1
+    environment:
+      PORT: 3001
+      NODE_ENV: ${DEVENV}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/admin"
+      MARVEL_API_PUBLIC_KEY: ${MARVEL_API_PUBLIC_KEY}
+      MARVEL_API_PRIVATE_KEY: ${MARVEL_API_PRIVATE_KEY}
+    volumes:
+      - ./server.js:/marvel-project/server.js
+      - ./ItemValidator.js:/marvel-project/ItemValidator.js
+      - ./public:/marvel-project/public
+    working_dir: /marvel-project
+    ports:
+      - "3003:80"
+    depends_on:
+      - mongodb
+      - mysql
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/mongo_data
+    ports:
+      - "27017:27017"
+    command: ["mongod", "--auth"]
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_INITDB_ROOT_PASSWORD}
+      MYSQL_DATABASE: marvel_mydb
+    volumes: 
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+volumes:
+  mongodb_data:
+  mysql_data:
+
