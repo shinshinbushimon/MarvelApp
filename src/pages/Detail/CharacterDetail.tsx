@@ -7,6 +7,7 @@ import { BaseBtn } from "src/atoms/Btn/BaseBtn";
 import { InfinityScroll } from "src/organisms/Scroll/InfinityScroll";
 import { useDetailSearch } from "customHooks";
 import { FavoriteIcon } from "src/atoms/Icon/BaseIcon";
+import { BackButton } from "src/atoms/Btn/BackButton";
 
 // 各関連要素のコンポーネントに, className=.marvelItemと追記すること
 
@@ -21,7 +22,6 @@ export const CharacterDetail: React.FC = () => {
   setId(characterId);
   const isLoading = useDetailSearch();
   let nav = useNavigate();
-  const backBtn = () => nav('/character');
   
   
   const mainData = useRecoilValue(targetCharacter);
@@ -34,7 +34,6 @@ export const CharacterDetail: React.FC = () => {
   const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
 
   // 省略: コンポーネントのレンダリング部分
-
     console.log("queryObjは、", query);
     return (
 
@@ -78,8 +77,7 @@ export const CharacterDetail: React.FC = () => {
                 {/* スクロール監視対象となる要素 */}
               </ItemDataContainer>
               
-              
-              <button onClick={backBtn}>リストへ戻る</button>
+              <BackButton/>
           </DetailContainer>
         </Container>
   );

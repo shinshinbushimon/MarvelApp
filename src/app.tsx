@@ -22,6 +22,7 @@ const App: React.FC = () => {
     const btnClick = () => setPageData(prevPage => prevPage+1);
     useFetchData();
     console.log("apidata: ", apiData[pageData]);
+    console.log("after");
     const nav = useNavigate();
 
     useEffect(() => {
@@ -30,7 +31,7 @@ const App: React.FC = () => {
         }
     
         if(isLogin) {
-            nav('/character');
+            nav('/mainPage');
         } else {
             nav('/signup');
         }

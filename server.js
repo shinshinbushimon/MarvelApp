@@ -13,6 +13,7 @@ const { validationResult } = require('express-validator');
 const marvelDBName = 'MarvelAppDatabase';
 const collectionOfChar = 'characters';
 const collectionOfFav = 'favorites';
+const collectionOfMovie = 'movies';
 
 const app = express();
 const port = process.env.PORT || 3001; //3001
@@ -158,6 +159,23 @@ app.get('/marvel-characters', async (req, res) => {
     }
 });
 
+app.get('/marvel-movies', async (req, res) => {
+    console.log("get request!!!");
+
+    try {
+        const movies = database.collection(collectionOfMovie);
+        // 全データを一度に取得
+        const results = await movies.find({}).toArray();
+        res.json(results);
+        console.log(results.length);
+        logger.info(`Successfully retrieved movie data`);
+    } catch (error) {
+        logger.error('API call failed:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+
 // search用で、dbに対して検索の処理
 app.get('/marvel-characters-search', async (req, res) => {
     // 以下dbデータ取得処理を実行
@@ -249,10 +267,6 @@ app.post('/removeFavorites', (req, res) => {
     }
 });
 
-// sessionの発行とクッキーの登録
-const saveSession = () => {
-
-}
 
 app.post('/session-generate', (req, res) => {
     const { userId } = req.body;

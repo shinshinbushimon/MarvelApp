@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { pageApiData } from 'src/type/app';
+import { pageApiData, MovieData } from 'src/type/app';
 import { Character } from 'src/type/Character';
 import { Comic } from 'src/type/Comic';
 import { Creator } from 'src/type/Creators';
@@ -96,4 +96,22 @@ export const loggedInItem = atom<string[]>({
 export const totalDataCountState = atom<number>({
   key: "totalDataCount",
   default: undefined
+});
+
+// movieデータ
+export const movies = atom<MovieData[]>({
+  key: "movies",
+  default: []
+});
+
+// 選択されているナビゲーション
+export const selectedNav = atom<string>({
+  key: "selectedNav",
+  default: 'movies'
+});
+
+// 映画情報の並び順
+export const movieArrPatern = atom<string>({
+  key: "movieArrPatern",
+  default: ""
 });

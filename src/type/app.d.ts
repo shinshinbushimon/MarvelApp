@@ -101,7 +101,29 @@ export interface InitialDataResponse {
     dataCount?: number
 }
 
+export interface DropdownProps {
+    selectedValue: string; // 現在選択されている値
+    onChange: (value: string) => void;
+}
+
 /*
     お気に入りしたCharacterIdのstring配列で
     後ほどRecoilAtomで管理
 */
+
+export interface MovieData {
+    adult: boolean;
+    backdrop_path: string;
+    genre_ids: number[];
+    id: number;
+    original_language: string;
+    original_title: string;
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    release_date: string;
+    title: string;
+    video: boolean;
+    vote_average: number;
+    vote_count: number;
+}

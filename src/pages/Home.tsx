@@ -38,6 +38,7 @@ const Button = styled(Link)`
 
 // signupボタンのルーティングや処理の実装
 export const SignUpPage = () => {
+  const routePath = '/mainPage';
   const userIdElement = useInputValidation('');
   const passwordElement = useInputValidation('');
   const [authError, setAuthError] = useState<string>(''); // customhooksに渡す
@@ -56,7 +57,7 @@ export const SignUpPage = () => {
 
       if(useStatus) {
         setUserId(userIdElement.value);
-        nav('/character');
+        nav(routePath);
       }
   }
 
@@ -86,6 +87,7 @@ export const SignUpPage = () => {
 
 
 export const LoginPage = () => {
+  const routePath = '/mainPage';
   const userIdElement = useInputValidation('');
   const passwordElement = useInputValidation('');
   const [authError, setAuthError] = useState<string>('');
@@ -99,7 +101,7 @@ export const LoginPage = () => {
   // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
   if(useStatus) {
     setUserId(userIdElement.value);
-    nav('/character');
+    nav(routePath);
   }
 
   const renderingAct = async () => {
@@ -111,7 +113,7 @@ export const LoginPage = () => {
       
       if(useStatus) {
         setUserId(userIdElement.value);
-        nav('/character');
+        nav(routePath);
       }
     }
 

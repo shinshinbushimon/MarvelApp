@@ -3,19 +3,43 @@ import { Label } from "src/atoms/Label/BaseLabel";
 import { BaseImage } from "src/atoms/Img/BaseImg";
 import { CustomLink } from "src/atoms/Link/BaseLink";
 import { Character } from "src/type/Character";
+import { MovieData } from "src/type/app";
 import { Image } from "src/type/Common";
 import styled from "styled-components";
-import { createImg } from "customHooks";
+import { createImg, getMoviePoster } from "customHooks";
 
 
 
-export const CharacterItem: React.FC<Character> = ({ name, thumbnail }) => {
+export const CharacterItem: React.FC<Character> = ({ id, name, thumbnail }) => {
   return (
       <SCharacterItem>
           <ImageContainer>
               <BaseImage src={createImg(thumbnail)} alt={name} />
           </ImageContainer>
           <NameContainer>{name}</NameContainer>
+          <NameContainer>{id}</NameContainer>
+
+      </SCharacterItem>
+  );
+};
+
+export const MovieItem: React.FC<MovieData> = 
+  ({ 
+    backdrop_path, 
+    original_title,
+    overview,
+    poster_path,
+    release_date,
+    title,
+    vote_average
+  }) => {
+  return (
+
+      <SCharacterItem>
+          <ImageContainer>
+              <BaseImage src={getMoviePoster(poster_path)} alt={title} />
+          </ImageContainer>
+          <NameContainer>{title}</NameContainer>
       </SCharacterItem>
   );
 };

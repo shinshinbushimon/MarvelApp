@@ -1,11 +1,13 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MarvelApi, currentPage, searchValue, searchOutput, targetCharacterId, targetCharacter, AllScrollData, userId, hasAcceptedUser, loggedInItem, loginStatus, totalDataCountState } from './RecoilAtom';
+import { MarvelApi, currentPage, searchValue, searchOutput, targetCharacterId, targetCharacter, AllScrollData, userId, hasAcceptedUser, loggedInItem, loginStatus, totalDataCountState, movies, movieArrPatern } from './RecoilAtom';
 import { Character } from 'src/type/Character';
 import { Image, MarvelElement } from 'src/type/Common';
 import { ComicDataContainer } from 'src/type/Comic';
 import { ValidationHook, ServerHasErrorResponse, ServerSessionResponse, InitialDataResponse } from 'src/type/app';
 import { useNavigate } from 'react-router-dom';
+import { get } from 'http';
+import axios from 'axios';
 
 if(process.env.NODE_ENV === 'development') {
     console.log('これは開発環境用のビルドです。')
@@ -114,6 +116,27 @@ export const useFetchData = () => {
         }
         fetchData();
     }, [apiData, setApiData, pageData]);
+}
+
+// 映画情報を取得するカスタムフック
+export const useFetchMoviesData = () => {
+    const setMovies = useSetRecoilState(movies);
+    const url = `${REQUEST_POINT}/marvel-movies`
+
+    useEffect(() => {
+        const getMovieData = async () => {
+            try {
+                const response = await axios.get(url);
+                const data = response.data;
+                setMovies(data);
+            } catch (err) {
+                console.error('Error fetching data:', err);
+            }
+            
+        }
+        getMovieData();
+    }, [])
+
 }
 
 // 検索結果表示のためにリクエストを依頼するカスタムフック
@@ -334,4 +357,55 @@ export const createImg = (img: Image) => {
     return img.path + '.' + img.extension
 }
 
+export const getMoviePoster = (posterPath: string) => {
+    return `https://image.tmdb.org/t/p/original${posterPath}`;
+}
+
+export const hiraToKata = (str: string) => {
+    return str.replace(/[\u3041-\u3096]/g, ch =>
+        String.fromCharCode(ch.charCodeAt(0) + 0x60)
+    );
+}
+
+export const useChangeArrayment = () => {
+    const [AllMovie, SetAllMovie] = useRecoilState(movies);
+    const setMovieArrPattern = useSetRecoilState(movieArrPatern);
+
+    const changeArrayment = (pattern: string) => {
+        console.log("called changeArrayment");
+        
+        const copyAllMovie = [...AllMovie];
+    
+        switch (pattern) {
+            case 'accending':
+                copyAllMovie.sort((m, n) => m.title.localeCompare(n.title));
+                break;
+            case 'descending':
+                copyAllMovie.sort((m, n) => n.title.localeCompare(m.title));
+                break;
+            case 'public order':
+                    copyAllMovie.sort((m, n) => {
+                        const dataM = new Date(m.release_date);
+                        const dataN = new Date(n.release_date);
+                        return dataN.getTime() - dataM.getTime();
+                    })
+                    break;
+            case 'public disorder':
+                    copyAllMovie.sort((m, n) => {
+                        const dataM = new Date(m.release_date);
+                        const dataN = new Date(n.release_date);
+                        return dataM.getTime() - dataN.getTime();
+                    })
+                    break;
+            case 'popularity':
+                copyAllMovie.sort((m, n) => n.popularity - m.popularity);
+                break;
+        }
+        
+        setMovieArrPattern(pattern);
+        SetAllMovie(copyAllMovie);
+    }
+
+    return changeArrayment;
+}
 
