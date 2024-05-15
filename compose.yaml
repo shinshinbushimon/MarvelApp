@@ -10,12 +10,15 @@ services:
       NODE_ENV: ${DEVENV}
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/admin"
+      MONGO_URI: ${MONGO_URI}
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_INITDB_ROOT_PASSWORD: ${MYSQL_INITDB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
       MARVEL_API_PUBLIC_KEY: ${MARVEL_API_PUBLIC_KEY}
       MARVEL_API_PRIVATE_KEY: ${MARVEL_API_PRIVATE_KEY}
     volumes:
-      - ./server.js:/marvel-project/server.js
-      - ./ItemValidator.js:/marvel-project/ItemValidator.js
+      - ./dist/backend/src:/marvel-project/servers
       - ./public:/marvel-project/public
     working_dir: /marvel-project
     ports:
@@ -30,7 +33,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
-      - mongodb_data:/data/mongo_data
+      - mongodb_data:/data/db
     ports:
       - "27017:27017"
     command: ["mongod", "--auth"]
@@ -39,7 +42,7 @@ services:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_INITDB_ROOT_PASSWORD}
-      MYSQL_DATABASE: marvel_mydb
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes: 
       - mysql_data:/var/lib/mysql
     ports:

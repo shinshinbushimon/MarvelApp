@@ -3,7 +3,7 @@ import { FavoriteIcon } from "./BaseIcon";
 import * as hooks from 'customHooks'; 
 import { RecoilRoot } from "recoil";
 import React from "react";
-import { favoriteCharacterInfos, userId } from 'RecoilAtom';
+import { loggedInItem, userId } from 'RecoilAtom';
 
 import userEvent from "@testing-library/user-event";
 

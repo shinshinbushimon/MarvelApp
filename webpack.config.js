@@ -40,7 +40,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: "ts-loader",
-                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)/,
+                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)|backend|dist/,
             },
 
             {
@@ -51,7 +51,7 @@ module.exports = {
                         presets: ['@babel/preset-env', '@babel/preset-react'],
                     },
                 },
-                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)/,
+                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)|backend|dist/,
             },
         ],
     },

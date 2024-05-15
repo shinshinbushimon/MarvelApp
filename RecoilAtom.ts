@@ -70,10 +70,6 @@ export const userId = atom<string>({
 });
 
 // お気に入りたち
-export const favoriteCharacterInfos = atom<number[]>({
-  key: 'favoriteCharacterInfos',
-  default: []
-});
 
 export const hasAcceptedUser = atom<boolean>({
   key: "HasAcceptedUser",

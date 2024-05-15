@@ -4,3 +4,12 @@ dist/
 marvel-*.json
 moviesData.json
 public/bundle.js
+server.js
+ItemValidator.js
+dataImporter.js
+devEnvOpenBrowser.mjs
+envTest.js
+movieCastData.js
+moviedataImporter.js
+howToCreate.txt
+howToCreateEnv.txt

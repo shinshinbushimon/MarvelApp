@@ -8,6 +8,7 @@ RUN yum install -y nginx
 RUN yum install -y nodejs
 RUN npm install -g pm2
 RUN yum clean all
+RUN yum install -y vim
 
 WORKDIR /marvel-project
 

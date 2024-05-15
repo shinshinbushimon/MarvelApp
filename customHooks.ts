@@ -48,10 +48,11 @@ export const useHasEverLogin = () => {
                     }
                 } 
                 const sessionRes = data as ServerSessionResponse;
+                console.log("this users favorites are ", sessionRes.accountData);
                 setUserFavorite(sessionRes.accountData);
 
                 if(sessionRes.loggedIn) {
-                    console.log('Iknow this user!!!');
+                    console.log('I know this user!!!');
                     setLoginStatus(true);
                     
                 } else {
@@ -217,11 +218,11 @@ export const useInputValidation = (initialValue: string): ValidationHook => {
         if (!isTyping) return; 
         const timer = setTimeout(() => {
             if (value === '') {
-                setError('This field cannot be empty.');
+                setError('入力がありません');
             } else if (!regax.test(value)) {
-                setError('Invalid characters used. Only alphanumeric characters are allowed.');
+                setError('英数字のみ入力が可能です');
             } else if (value.length < 5) {
-                setError('The input must be at least 5 characters long.');
+                setError('5文字以上で入力');
             } else {
                 setError('');
             }
@@ -254,16 +255,18 @@ export const useVerifyEnteredData = (setAuthError: (error: string) => void) => {
       setIsLoading(true);
       console.log("userId is: ", userId);
       console.log("password is: ", password);
+      console.log("更新は反映されています。");
 
       try {
         const response = await fetch(`${REQUEST_POINT}/${targetDomain}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: userId, password: password}),
+          body: JSON.stringify({ username: userId, password: password}),
           credentials: 'include',
         });
         const data = await response.json();
         if (!response.ok) {
+            console.error(`Error: ${response.status} - ${data.message || 'An error occurred'}`);
           throw new Error(data.message || 'An error occurred');
         }
         acceptUser(data.success);
@@ -291,12 +294,12 @@ export const createURI = (
 // お気に入りのuserId: characterid配列の組み合わせを格納するカスタムフック
 export const addToFavorites = async (userId: string, characterId: number) => {
     try {
-        const response = await fetch('http://localhost:3001/addFavorites', {
+        const response = await fetch(`${REQUEST_POINT}/addFavorites`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userId: userId, characterId: characterId }),
+            body: JSON.stringify({ username: userId, characterId: characterId }),
             credentials: 'include',
         });
 
@@ -315,7 +318,7 @@ export const removeFromFavorites = async (userId: string, characterId: number) =
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ userId: userId, characterId: characterId }),
+            body: JSON.stringify({ username: userId, characterId: characterId }),
             credentials: 'include',
         });
 
@@ -335,7 +338,7 @@ export const generateSession = async () => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: userIdInfo }),
+        body: JSON.stringify({ username: userIdInfo }),
         credentials: 'include',
     });
 
