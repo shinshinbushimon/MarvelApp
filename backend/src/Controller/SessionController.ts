@@ -17,6 +17,7 @@ export class SessionController {
         try {
             const sessionId = req.cookies.sessionId;  // クッキーからセッションIDを取得
             const username = req.body.username;
+            
             if (!sessionId) {
                 // セッションIDが存在しない場合は新しいセッションを作成
                 const newSessionId = await this.SessionRepo.createSession(username);  // 新しいセッションIDを作成するメソッドを呼び出す
@@ -29,8 +30,11 @@ export class SessionController {
                 return;
             }
             
+            // セッションIDが存在する場合の処理を追加（例：既存のセッションを更新するなど）
+            res.status(200).json({ success: true, message: '既存のセッションが確認されました' });
+    
         } catch (error) {
-            logger.error("セッション追加でエラー発生", error.message);
+            logger.error("セッション追加でエラー発生: " + error.message);
             res.status(500).json({ success: false, message: 'セッション追加に失敗しました' });
             console.error(error);
             next(error);
@@ -66,7 +70,7 @@ export class SessionController {
                 });
                 return;
             }
-    
+            // ここまで来たらセッションが確認できたということ
             const username = userSessionData.userId;
             const favoriteIds = await this.FavRepo.getFavoritesByUserId(username);
             console.log("this user's favoriteIds are ", favoriteIds);

@@ -4,7 +4,7 @@ import { MarvelApi, currentPage, searchValue, searchOutput, targetCharacterId, t
 import { Character } from 'src/type/Character';
 import { Image, MarvelElement } from 'src/type/Common';
 import { ComicDataContainer } from 'src/type/Comic';
-import { ValidationHook, ServerHasErrorResponse, ServerSessionResponse, InitialDataResponse } from 'src/type/app';
+import { ValidationHook, ServerHasErrorResponse, ServerSessionResponse, InitialDataResponse, ServerErrors } from 'src/type/app';
 import { useNavigate } from 'react-router-dom';
 import { get } from 'http';
 import axios from 'axios';
@@ -143,14 +143,17 @@ export const useFetchMoviesData = () => {
 // 検索結果表示のためにリクエストを依頼するカスタムフック
 export const useSearchOutput = () => {
     const searchQuery = useRecoilValue(searchValue); // inputに紐づける検索値
-    const [_, setSearchResults] = useRecoilState(searchOutput); // 検索結果を保持する配列
+    const setSearchResults = useSetRecoilState(searchOutput); // 検索結果を保持する配列
 
     useEffect(() => {
         const fetchData = async () => {
             if (searchQuery) {
+                setSearchResults([]);
                 const jobId = setTimeout(async () => {
                     const response = await fetch(`${REQUEST_POINT}/marvel-characters-search?name=${searchQuery}`);
-                    setSearchResults(await response.json());
+                    const searchedData = await response.json();
+                    console.log("取得した検索文字列たちは", searchedData);
+                    setSearchResults(searchedData);
                 }, waitTime);
 
                 return () => clearTimeout(jobId);
@@ -242,8 +245,9 @@ export const useInputValidation = (initialValue: string): ValidationHook => {
 
 // した二つのデータベース利用処理ではアプリケーションサーバ側でもバリデーションを実施させること
 // 新規登録時に重複していないかを確かめる。
-export const useVerifyEnteredData = (setAuthError: (error: string) => void) => {
+export const useVerifyEnteredData = (setAuthError: (error: ServerErrors[]) => void) => {
     const [isLoading, setIsLoading] = useState(false);
+    const setFavorites = useSetRecoilState(loggedInItem);
   
     const verifyData = useCallback(
         async (
@@ -251,38 +255,52 @@ export const useVerifyEnteredData = (setAuthError: (error: string) => void) => {
             password: string, 
             targetDomain: string, 
             acceptUser: (output: boolean) => void
-            ) => {
-      setIsLoading(true);
-      console.log("userId is: ", userId);
-      console.log("password is: ", password);
-      console.log("更新は反映されています。");
+        ): Promise<boolean> => {
+            setIsLoading(true);
+            console.log("userId is: ", userId);
+            console.log("password is: ", password);
+            console.log("更新は反映されています。");
 
-      try {
-        const response = await fetch(`${REQUEST_POINT}/${targetDomain}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: userId, password: password}),
-          credentials: 'include',
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            console.error(`Error: ${response.status} - ${data.message || 'An error occurred'}`);
-          throw new Error(data.message || 'An error occurred');
-        }
-        acceptUser(data.success);
-        console.log("accept user??", data.success);
-        console.log("the message from server: ", data.message);
-      } catch (error) {
-        setAuthError(error.message);
-      } finally {
-        setIsLoading(false);
-      }
-    }, [setAuthError]);
-  
+            try {
+                const response = await fetch(`${REQUEST_POINT}/${targetDomain}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: userId, password: password}),
+                    credentials: 'include',
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    console.error("このレスポンスエラーは ", response);
+                    console.error("このエラーデータは ", data);
+                    console.error(`Error: ${response.status} - ${data.errors || data.message || 'An error occurred'}`);
+                    
+                    // データの errors プロパティをエラーハンドリングに使用
+                    if (data.errors) {
+                        setAuthError(data.errors);
+                    } else {
+                        setAuthError([{ type: 'server', value: '', msg: data.message || 'An error occurred', path: 'general', location: 'server' }]);
+                    }
+                    
+                    return false;
+                }
+                
+                acceptUser(data.loggedIn);
+                setFavorites(data.accountData);
+                console.log("ログイン自体は成功しましたか", data.loggedIn);
+                console.log("お気に入りは受け取りましたか", data.accountData);
+
+                return data.loggedIn;
+            } catch (error) {
+                console.error("キャッチされたエラー:", error);
+                setAuthError([{ type: 'server', value: '', msg: error.message, path: 'general', location: 'server' }]);
+                return false;
+            } finally {
+                setIsLoading(false);
+            }
+        }, [setAuthError, setFavorites]);
+
     return { verifyData, isLoading };
-  };
-
-// serverpointを作成
+};// serverpointを作成
 export const createURI = (
     dataType: string, 
     characterId: number, 
@@ -330,28 +348,6 @@ export const removeFromFavorites = async (userId: string, characterId: number) =
 
 }
 
-// ログイン時または新規登録時にセッションの発行
-export const generateSession = async () => {
-    const userIdInfo = useRecoilValue(userId);
-    const response = await fetch('/session-generate', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: userIdInfo }),
-        credentials: 'include',
-    });
-
-    if (response.ok){
-        console.log('Login Successfull');
-        // 以下リダイレクトなど実施
-
-    } else {
-        // 認証失敗の処理
-        
-    }
-
-}
 
 export const createImg = (img: Image) => {
     if (!img || !img.path || !img.extension) {

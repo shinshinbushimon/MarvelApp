@@ -5,11 +5,13 @@ import { AiOutlineStar, AiFillStar } from 'react-icons/ai';
 import { loggedInItem, userId } from 'RecoilAtom';
 import { addToFavorites, removeFromFavorites } from 'customHooks'; // API関数のダミー
 
-export const FavoriteIcon: React.FC<{characterId: number}> = ({characterId}) => {
+export const FavoriteIcon: React.FC<{ characterId: number }> = ({ characterId }) => {
   const charaId = characterId.toString();
-  const [favorites, setFavorites] = useRecoilState(loggedInItem);
+  const favorites = useRecoilValue(loggedInItem);
   const [isFavorited, setIsFavorited] = useState(favorites.includes(charaId));
   const userIdNumber = useRecoilValue(userId);
+  const [favoritesState, setFavoritesState] = useRecoilState(loggedInItem);
+
   const iconProps = {
     'data-testid': isFavorited ? 'fill-star' : 'outline-star'
   };
@@ -17,19 +19,21 @@ export const FavoriteIcon: React.FC<{characterId: number}> = ({characterId}) => 
   // コンポーネントのマウント時にお気に入り状態を確認
   useEffect(() => {
     setIsFavorited(favorites.includes(charaId));
-  }, [favorites, characterId]);
+  }, [favorites, charaId]);
 
   const toggleFavorite = async () => {
-    setIsFavorited(!isFavorited);
     let newFavorites;
     if (!isFavorited) {
-      newFavorites = [...favorites, characterId];
+      newFavorites = [...favoritesState, charaId];
+      setIsFavorited(true);
+      setFavoritesState(newFavorites);
       await addToFavorites(userIdNumber, characterId); // DBに追加
     } else {
-      newFavorites = favorites.filter(id => id !== charaId);
+      newFavorites = favoritesState.filter(id => id !== charaId);
+      setIsFavorited(false);
+      setFavoritesState(newFavorites);
       await removeFromFavorites(userIdNumber, characterId); // DBから削除
     }
-    setFavorites(newFavorites);
   };
 
   return (

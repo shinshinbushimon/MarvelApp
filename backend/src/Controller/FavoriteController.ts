@@ -54,12 +54,35 @@ export class FavoriteController {
         next: express.NextFunction
     ): Promise<void> => {
         try {
-            const { userId, characterId } = req.body;
-            await this.FavoriteRepo.rmvCharFromFavorites(userId, characterId);
-            res.status(200).send("お気に入りにアイテムを削除しました");
+            const { username, characterId } = req.body;
+            await this.FavoriteRepo.rmvCharFromFavorites(username, characterId);
+            res.status(200).send("お気に入りアイテムを削除しました");
 
         } catch (e) {
             res.status(500).send("お気に入りアイテムの削除に失敗しました");
+            next(e);
+        }
+    }
+
+    getFavroites = async (
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+    ): Promise<void> => {
+        try {
+            const { username } = req.body;
+            const favorites = await this.FavoriteRepo.getFavoritesByUserId(username);
+            res.status(200).json({
+                loggedIn: false,
+                accountData: favorites
+                
+            });
+
+        } catch (e) {
+            res.status(500).json({
+                success: false,
+                message: "お気に入りアイテムの削除に失敗しました"
+            });
             next(e);
         }
     }

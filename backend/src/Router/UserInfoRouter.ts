@@ -25,7 +25,9 @@ export const UserInfoRouter = (
             return res.status(400).json({ errors: validationResult(req).array() });
         }
         next();
-    }, userController.addUsr);
+    }, userController.addUsr,
+       sessionController.addSession
+);
 
     router.post('/login', userValidationRules, 
     (
@@ -39,7 +41,7 @@ export const UserInfoRouter = (
         next();
     }, 
     userController.existUser,
-    userController.existPass,
+    userController.existPass, // ここでユーザのお気に入りアイテムたちを返すこと
     sessionController.addSession
 );
     return router;

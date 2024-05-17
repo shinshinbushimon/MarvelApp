@@ -67,9 +67,10 @@ export class CharacterController {
         next: express.NextFunction
     ): Promise<void> => {
         try {
-            const keyWord = req.query.name;
+            const keyWord = req.query.name as string;
+
             if(!keyWord) return;
-            const result = this.charRepos.searchCharByKey(keyWord as string);
+            const result = await this.charRepos.searchCharByKey(keyWord);
             res.status(200).json(result);
         } catch (e) {
             logger.error("キャラクターデータ取得に失敗しました");
@@ -85,7 +86,7 @@ export class CharacterController {
     ): Promise<void> => {
         try {
             const characterId = Number(req.query.characterId);
-            const result = this.charRepos.findCharById(characterId);
+            const result = await this.charRepos.findCharById(characterId);
             res.status(200).json(result);
         } catch (e) {
             logger.error('Internal Server Error');

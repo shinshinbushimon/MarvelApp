@@ -1,4 +1,3 @@
-
 // repositoryからrouteまですべてインスタンス作成して統合させること
 import dotenv from 'dotenv';
 import { MongoClient, Db } from 'mongodb';
@@ -86,7 +85,7 @@ export const startMarvelApp = async (): Promise<express.Express> => {
         const sessController = new SessionController(sessRepo, favRepo);
 
         const userRepo = new UserInfoRepository(mySqlOpt, tableName);
-        const userController = new UserInfoController(userRepo);
+        const userController = new UserInfoController(userRepo, favRepo);
 
         app.use("/", CharacterRoutes(charController));
         app.use("/", FavoriteRouter(favController));

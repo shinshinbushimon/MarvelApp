@@ -1,9 +1,13 @@
 import UserInfoRepository from "../Repository/UserInfoRepository";
 import express from 'express';
 import { logger } from "../util/Logger";
+import FavoriteRepository from "../Repository/FavoriteRepositry";
 
 export class UserInfoController {
-    constructor(private UserRepo: UserInfoRepository){}
+    constructor(
+        private UserRepo: UserInfoRepository,
+        private FavRepo: FavoriteRepository
+    ){}
 
     // 真偽値ではなく、データの件数を返す。これが0か1以上あるかで判定
     existUser = async (
@@ -15,7 +19,13 @@ export class UserInfoController {
             const { username } = req.body;
             const existUser = await this.UserRepo.existUserInfo(username);
             if (!existUser) {
-                res.status(404).json({ message: "該当のuserが存在しません", exist: false });
+                res.status(404).json({
+                    type: 'repository',
+                    value: username,
+                    msg: 'ユーザが存在しません。',
+                    path: 'username',
+                    location: 'existUser'
+                });
                 return;
             }
             next();
@@ -25,7 +35,7 @@ export class UserInfoController {
             next(e);
         }
     }
-
+    // login時のユーザネーム認証が通った後でしか呼ばれない
     existPass = async (
         req: express.Request,
         res: express.Response,
@@ -35,13 +45,31 @@ export class UserInfoController {
             const { username, password } = req.body;
             const existUser = await this.UserRepo.existPassWord(username, password);
             if (!existUser) {
-                res.status(401).json({ message: "パスワードが誤っています", exist: false });
+                res.status(401).json({
+                    type: 'repository',
+                    value: password,
+                    msg: 'パスワードが誤っています。',
+                    path: 'passwprd',
+                    location: 'existPass'
+                });
                 return;
             }
-            next();
+            // ここでお気に入りアイテムを返すように
+            const usersFavorites = await this.FavRepo.getFavoritesByUserId(username);
+            res.status(200).json({
+                loggedIn: true,
+                accountData: usersFavorites || []
+            });
+            next();// session追加処理
         } catch (e) {
             logger.error(`Error checking if password exists: ${e.message}`);
-            res.status(500).json({ message: 'userpasswordデータの取得に失敗しました', success: false });
+            res.status(500).json({
+                type: 'repository',
+                value: '',
+                msg: 'サーバでのパスワード処理に失敗しました',
+                path: 'passwprd',
+                location: 'existPass'
+            });
             next(e);
         }
     }
@@ -57,14 +85,29 @@ export class UserInfoController {
             console.log('userId は', username);
             const { existUserInfo, addUser } = this.UserRepo;
             if(await existUserInfo(username)) {
-                res.status(401).json({ message: 'user名が既に存在します', success: false });
+                res.status(401).json({
+                    type: 'repository',
+                    value: username,
+                    msg: 'ユーザネームが既に存在します',
+                    path: 'username',
+                    location: 'addUsr'
+                });
                 return;
             }
             await addUser({ username, password });
-            res.status(200).json({ message: 'user情報が登録されました', success: true });
+            res.status(200).json({ 
+                loggedIn: true,
+                accountData: []
+             });
         } catch (err) {
             logger.error(`Error adding user: ${err.message}`);
-            res.status(500).json({ message: 'user認証に失敗しました', success: false });
+            res.status(500).json({
+                type: 'repository',
+                value: '',
+                msg: 'サーバでの認証が失敗しました',
+                path: 'username',
+                location: 'addUsr'
+            });
             next(err);
         }
     }
@@ -92,7 +135,13 @@ export class UserInfoController {
             }
         } catch (e) {
             logger.error(`Error removing user: ${e.message}`);
-            res.status(500).json({ success: false, message: 'ユーザの削除処理に失敗しました' });
+            res.status(500).json({
+                type: 'repository',
+                value: '',
+                msg: 'サーバでの削除処理に失敗しました',
+                path: 'username and password',
+                location: 'rmvUsr'
+            });
             next(e);
         }
     }

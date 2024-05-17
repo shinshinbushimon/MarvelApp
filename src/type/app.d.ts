@@ -127,3 +127,11 @@ export interface MovieData {
     vote_average: number;
     vote_count: number;
 }
+
+export interface ServerErrors {
+    type: string,
+    value: string,
+    msg: string,
+    path: string,
+    location: string
+}
