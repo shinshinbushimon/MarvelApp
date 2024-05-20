@@ -4,13 +4,20 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { AiOutlineStar, AiFillStar } from 'react-icons/ai';
 import { loggedInItem, userId } from 'RecoilAtom';
 import { addToFavorites, removeFromFavorites } from 'customHooks'; // API関数のダミー
+import { FavoriteProps } from 'src/type/app';
 
-export const FavoriteIcon: React.FC<{ characterId: number }> = ({ characterId }) => {
-  const charaId = characterId.toString();
-  const favorites = useRecoilValue(loggedInItem);
-  const [isFavorited, setIsFavorited] = useState(favorites.includes(charaId));
+export const FavoriteIcon: React.FC<FavoriteProps> = ({ 
+  targetId,
+  favorites,
+  setFavorites,
+  targetItem
+ }) => {
+
+  const [isFavorited, setIsFavorited] = useState(favorites.includes(targetId));
+  console.log('お気に入りたちはこいつらです', favorites);
+  console.log('このキャラクターはお気に入りの一部ですか', favorites.includes(targetId));
+  console.log('そして結果はどのように解釈されていますか', isFavorited);
   const userIdNumber = useRecoilValue(userId);
-  const [favoritesState, setFavoritesState] = useRecoilState(loggedInItem);
 
   const iconProps = {
     'data-testid': isFavorited ? 'fill-star' : 'outline-star'
@@ -18,21 +25,21 @@ export const FavoriteIcon: React.FC<{ characterId: number }> = ({ characterId })
 
   // コンポーネントのマウント時にお気に入り状態を確認
   useEffect(() => {
-    setIsFavorited(favorites.includes(charaId));
-  }, [favorites, charaId]);
+    setIsFavorited(favorites.includes(targetId));
+  }, [favorites, targetId]);
 
   const toggleFavorite = async () => {
     let newFavorites;
     if (!isFavorited) {
-      newFavorites = [...favoritesState, charaId];
+      newFavorites = [...favorites, targetId];
       setIsFavorited(true);
-      setFavoritesState(newFavorites);
-      await addToFavorites(userIdNumber, characterId); // DBに追加
+      setFavorites(newFavorites);
+      await addToFavorites(userIdNumber, targetId, targetItem); // DBに追加
     } else {
-      newFavorites = favoritesState.filter(id => id !== charaId);
+      newFavorites = favorites.filter(id => id !== targetId);
       setIsFavorited(false);
-      setFavoritesState(newFavorites);
-      await removeFromFavorites(userIdNumber, characterId); // DBから削除
+      setFavorites(newFavorites);
+      await removeFromFavorites(userIdNumber, targetId, targetItem); // DBから削除
     }
   };
 

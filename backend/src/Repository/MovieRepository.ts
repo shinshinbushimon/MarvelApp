@@ -1,5 +1,7 @@
 import { Collection, Db } from "mongodb";
 import { DocumentDB } from "../type";
+import { MovieData } from "../shared-types/app";
+import { logger } from "../util/Logger";
 
 class MovieRepository implements DocumentDB {
     collectionName: string;
@@ -25,6 +27,16 @@ class MovieRepository implements DocumentDB {
     getMovieData = async (): Promise<any> => {
         return await this.collection.find({}).toArray();
     }
+
+    getFavMovieDatas = async (targetMovieIds: number[]): Promise<MovieData[]> => {
+        try {
+            const movieDatas = await this.collection.find({ id: { $in: targetMovieIds } }).toArray();
+            return movieDatas as MovieData[];
+        } catch(e) {
+            logger.error(`映画情報の取得に失敗`);
+            throw new Error(e.message);
+        }
+    } 
 
 }
 

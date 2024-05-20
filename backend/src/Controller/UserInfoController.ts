@@ -49,7 +49,7 @@ export class UserInfoController {
                     type: 'repository',
                     value: password,
                     msg: 'パスワードが誤っています。',
-                    path: 'passwprd',
+                    path: 'password',
                     location: 'existPass'
                 });
                 return;
@@ -58,7 +58,7 @@ export class UserInfoController {
             const usersFavorites = await this.FavRepo.getFavoritesByUserId(username);
             res.status(200).json({
                 loggedIn: true,
-                accountData: usersFavorites || []
+                accountData: usersFavorites
             });
             next();// session追加処理
         } catch (e) {
@@ -67,7 +67,7 @@ export class UserInfoController {
                 type: 'repository',
                 value: '',
                 msg: 'サーバでのパスワード処理に失敗しました',
-                path: 'passwprd',
+                path: 'password',
                 location: 'existPass'
             });
             next(e);

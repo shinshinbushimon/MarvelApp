@@ -8,5 +8,8 @@ export const FavoriteRouter = (
 ): express.Router => {
     router.post('/addFavorites', controller.addToFavorites);
     router.post('/removeFavorites', controller.rmvFromFavorites);
+    router.post('/addMovieFavorites', controller.addToMovieFavorites);
+    router.post('/removeMovieFavorites', controller.rmvFromMovieFavorites);    
+    router.post('/get-favorite-data', controller.getFavoriteDatas);
     return router;
 }

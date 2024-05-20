@@ -81,7 +81,7 @@ export const startMarvelApp = async (): Promise<express.Express> => {
 
         const sessRepo = new SessionRepository(MDatabase);
         const favRepo = new FavoriteRepository(MDatabase, collectionOfFav);
-        const favController = new FavoriteController(favRepo, sessRepo);
+        const favController = new FavoriteController(favRepo, sessRepo, charRepo, movieRepo);
         const sessController = new SessionController(sessRepo, favRepo);
 
         const userRepo = new UserInfoRepository(mySqlOpt, tableName);

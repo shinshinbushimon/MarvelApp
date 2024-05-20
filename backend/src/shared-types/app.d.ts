@@ -5,7 +5,6 @@ import { Creator } from "./Creators";
 import { Event } from "./Event";
 import { Series } from "./Series";
 import { MarvelElement } from "./Common";
-import { FavoriteItemType } from "./enum";
 
 export interface postType {
     type: string,
@@ -95,7 +94,7 @@ export interface ServerHasErrorResponse {
 
 export interface ServerSessionResponse {
     loggedIn: boolean,
-    accountData: { characterIds: number[], movieIds: number[] } 
+    accountData: Character[] 
 }
 
 export interface InitialDataResponse {
@@ -135,17 +134,4 @@ export interface ServerErrors {
     msg: string,
     path: string,
     location: string
-}
-
-export interface ServerFavoriteResponse {
-    characters: Character[],
-    movies: MovieData[]
-}
-
-
-export interface FavoriteProps {
-    targetId: number,
-    favorites: number[], // 映画のかCharacterのお気に入り
-    setFavorites: (favs: number[]) => void,
-    targetItem: FavoriteItemType
 }

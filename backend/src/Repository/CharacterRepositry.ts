@@ -1,6 +1,7 @@
 import { Db, Collection, Document } from "mongodb";
 import { DocumentDB } from "../type";
 import { logger } from "../util/Logger";
+import { Character } from "../shared-types/Character";
 
 
 export class CharacterRepository implements DocumentDB{
@@ -67,6 +68,22 @@ export class CharacterRepository implements DocumentDB{
             throw new Error(`Database Detail error: ${err.message}`);
         }
     }
+
+    // コレクションから お気に入り に含まれるキャラクターを全て取得
+    findSomeCharsById = 
+    async (targetCharIds: number[])
+    : Promise<Character[]> => {
+        try {
+            const result = await this.collection.find({ id: { $in: targetCharIds } }).toArray();
+            console.log('これはお気に入りアイテムとして取得したキャラクターの結果です', result);
+            return result as Character[];
+        } catch (error) {
+            console.error("Error fetching favorite characters:", error);
+            throw new Error("Failed to fetch favorite characters");
+        }
+    }
+    
+
 
 
 }

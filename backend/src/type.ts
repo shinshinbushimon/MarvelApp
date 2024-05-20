@@ -19,7 +19,13 @@ export interface DocumentDB {
 
 export interface UserFavDocument {
     userId: string,
-    characterIds: number[]
+    characterIds: number[],
+    movieIds: number[]
+}
+
+export interface UserFavIds {
+    characterIds: number[],
+    movieIds: number[]
 }
 
 export interface mySQLAuth {
@@ -28,3 +34,20 @@ export interface mySQLAuth {
     password: string,
     databaseName: string
 }
+
+export interface MovieData {
+    adult: boolean;
+    backdrop_path: string;
+    genre_ids: number[];
+    id: number;
+    original_language: string;
+    original_title: string;
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    release_date: string;
+    title: string;
+    video: boolean;
+    vote_average: number;
+    vote_count: number;
+}  

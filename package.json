@@ -57,6 +57,8 @@
     "concurrently": "^8.2.2",
     "copy-webpack-plugin": "^12.0.2",
     "eslint": "^9.0.0",
+    "fs": "^0.0.1-security",
+    "ignore-loader": "^0.1.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "jest-fetch-mock": "^3.0.3",

@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 require('dotenv').config();
 const webpack = require('webpack');
 const { CleanWebpackPlugin }  = require('clean-webpack-plugin');
@@ -40,7 +41,7 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 use: "ts-loader",
-                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)|backend|dist/,
+                exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)|backend|dist|\.d\.ts$/, // 修正点
             },
 
             {
@@ -53,16 +54,23 @@ module.exports = {
                 },
                 exclude: /node_modules|(__tests__|\.test\.js$|\.spec\.js$)|backend|dist/,
             },
+            {
+                test: /\.d\.ts$/, // 追加: 型定義ファイルを無視するルール
+                loader: 'ignore-loader'
+            },
         ],
     },
     resolve: {
         alias: {
             'RecoilAtom': path.resolve(__dirname, 'RecoilAtom.ts'),
             'customHooks': path.resolve(__dirname, 'customHooks.ts'),
-            'src': path.resolve(__dirname, 'src/')
+            'src': path.resolve(__dirname, 'src/'),
+            'type': path.resolve(__dirname, 'src/type'),
+            'src/type/app': path.resolve(__dirname, 'src/type/app'),
+            'src/type/enum': path.resolve(__dirname, 'src/type/enum'),
           },
     
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".d.ts"],
     },
     plugins: [
         new CleanWebpackPlugin(), // 全て消し去る
@@ -77,5 +85,21 @@ module.exports = {
           'process.env.REQUEST_URL': JSON.stringify(process.env.SERVER_DEV_URL),
           'process.env.TLS_CA_FILE': JSON.stringify(process.env.DEVLOPMENT_TLS_CA_FILE),
       })
-    ]
+    ],
+    stats: {
+        errorDetails: true,
+        logging: 'verbose'
+    },
+    infrastructureLogging: {
+        level: 'verbose'
+      }
 }
+
+console.log('Webpack configuration:');
+console.log('Aliases:', {
+    'RecoilAtom': path.resolve(__dirname, 'RecoilAtom.ts'),
+    'customHooks': path.resolve(__dirname, 'customHooks.ts'),
+    'src': path.resolve(__dirname, 'src/'),
+    'type': path.resolve(__dirname, 'src/type'),
+    'src/type/app': path.resolve(__dirname, 'src/type/app.d.ts'),
+  });

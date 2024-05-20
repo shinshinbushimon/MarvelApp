@@ -6,6 +6,8 @@ import React from "react";
 import { loggedInItem, userId } from 'RecoilAtom';
 
 import userEvent from "@testing-library/user-event";
+import { FavoriteProps } from "src/type/app";
+import { FavoriteItemType } from "src/type/enum";
 
 jest.mock('customHooks', () => ({
     addToFavorites: jest.fn(),
@@ -16,6 +18,12 @@ const mockedCustomHooks = jest.mocked(hooks);
 const testUserId = 'testuser'
 const testId = 1;
 const user = userEvent.setup();
+const testProp: FavoriteProps = {
+    targetId: 0,
+    favorites: [],
+    setFavorites: (nums: number[]) => console.log(nums),
+    targetItem: FavoriteItemType.Character
+}
 
 describe('お気に入りアイコンに関する処理のテスト', () => {
     beforeEach(() => {
@@ -24,7 +32,7 @@ describe('お気に入りアイコンに関する処理のテスト', () => {
             <RecoilRoot initializeState={(snapshot) => {
                 snapshot.set(userId, testUserId); // userIdState に testUserId を設定
             }}>
-                <FavoriteIcon characterId={testId} />
+                <FavoriteIcon {...testProp} />
             </RecoilRoot>
         );
     });

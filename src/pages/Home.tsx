@@ -41,6 +41,7 @@ const Button = styled.button<{ disbled?: boolean }>`
 // signupボタンのルーティングや処理の実装
 export const SignUpPage = () => {
   const routePath = '/mainPage';
+  const minLen = 5;
   const userIdElement = useInputValidation('');
   const passwordElement = useInputValidation('');
   const [authError, setAuthError] = useState<ServerErrors[]>([]); // customhooksに渡す
@@ -69,7 +70,11 @@ const renderErrorMessages = (path: string) => {
       .map((error, index) => <p key={index}>{error.msg}</p>);
 };
 
-const isButtonDisabled = !userIdElement.value || !passwordElement.value || userIdElement.error || passwordElement.error;
+const isButtonDisabled = (minimumLen: number) => {
+  const HasUsernameProblem = (userIdElement.value.length < minimumLen) || userIdElement.error.length > 0;
+  const HasPasswordProblem = (passwordElement.value.length < minimumLen) || passwordElement.error.length > 0;
+  return HasUsernameProblem || HasPasswordProblem;
+}
 
 return (
     <Container>
@@ -90,7 +95,7 @@ return (
         />
         {passwordElement.error && <p>{passwordElement.error}</p>}
         {renderErrorMessages('password')}
-        <Button onClick={renderingAct} disabled={isButtonDisabled !== ''}>
+        <Button onClick={renderingAct} disabled={isButtonDisabled(minLen)}>
           Sign up
         </Button>
         <Button as={Link} to="/login">Already have an account? Log In</Button>
@@ -101,6 +106,7 @@ return (
 
 export const LoginPage = () => {
   const routePath = '/mainPage';
+  const minLen = 5;
   const userIdElement = useInputValidation('');
   const passwordElement = useInputValidation('');
   const [authError, setAuthError] = useState<ServerErrors[]>([]);
@@ -110,17 +116,6 @@ export const LoginPage = () => {
   const loginDomain = 'login'
   const { verifyData } = useVerifyEnteredData(setAuthError);  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
 
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-
-  useEffect(() => {
-    const checkButtonState = () => {
-      const hasError = Boolean(userIdElement.error) || Boolean(passwordElement.error);
-      const isEmpty = !userIdElement.value || !passwordElement.value;
-      setIsButtonDisabled(hasError || isEmpty);
-    };
-
-    checkButtonState();
-  }, [userIdElement.value, userIdElement.error, passwordElement.value, passwordElement.error]);
 
   // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
   if(useStatus) {
@@ -145,7 +140,14 @@ export const LoginPage = () => {
       return authError
           .filter(error => error.path === path)
           .map((error, index) => <p key={index}>{error.msg}</p>);
-    };    
+    };
+
+    const isButtonDisabled = (minimumLen: number) => {
+      const HasUsernameProblem = (userIdElement.value.length < minimumLen) || userIdElement.error.length > 0;
+      const HasPasswordProblem = (passwordElement.value.length < minimumLen) || passwordElement.error.length > 0;
+      return HasUsernameProblem || HasPasswordProblem;
+    }
+    
 
 
   return (
@@ -167,7 +169,7 @@ export const LoginPage = () => {
       />
       {passwordElement.error && <p>{passwordElement.error}</p>}
       {renderErrorMessages('password')}
-      <Button onClick={renderingAct} disabled={isButtonDisabled}>
+      <Button onClick={renderingAct} disabled={isButtonDisabled(minLen)}>
           Log in
         </Button>
         <Button as={Link} to="/signup">Already have an account? Sign Up</Button>

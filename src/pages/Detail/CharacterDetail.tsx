@@ -1,13 +1,15 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
 import { useLocation, useNavigate } from "react-router-dom";
-import { targetCharacterId, targetCharacter, AllScrollData } from "RecoilAtom";
+import { targetCharacterId, targetCharacter, AllScrollData, loggedInItem } from "RecoilAtom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { BaseBtn } from "src/atoms/Btn/BaseBtn";
 import { InfinityScroll } from "src/organisms/Scroll/InfinityScroll";
 import { useDetailSearch } from "customHooks";
 import { FavoriteIcon } from "src/atoms/Icon/BaseIcon";
 import { BackButton } from "src/atoms/Btn/BackButton";
+import { FavoriteProps } from "src/type/app";
+import { FavoriteItemType } from "src/type/enum";
 
 // 各関連要素のコンポーネントに, className=.marvelItemと追記すること
 
@@ -16,7 +18,7 @@ export const CharacterDetail: React.FC = () => {
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const characterId = Number(query.get("characterId"));
-  console.log("characterId is ", characterId);
+  const [favoriteChar, setFavoriteChar] = useRecoilState(loggedInItem);
 
   const setId = useSetRecoilState(targetCharacterId);
   setId(characterId);
@@ -32,13 +34,22 @@ export const CharacterDetail: React.FC = () => {
 
   // データが存在しない場合はローディング表示
   const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
+  // ここでFavoriteItemTypeの値を確認する
+  console.log("FaviriteItemTypeの値は、", FavoriteItemType); // { 0: "Character", 1: "Movie", Character: 0, Movie: 1 }
+  console.log(FavoriteItemType.Character); // 1
+  
+  const favProp: FavoriteProps = {
+    targetId: characterId,
+    favorites: favoriteChar,
+    setFavorites: setFavoriteChar,
+    targetItem: FavoriteItemType.Character
+  }
 
   // 省略: コンポーネントのレンダリング部分
-    console.log("queryObjは、", query);
     return (
 
         <Container>
-          <FavoriteIcon characterId={characterId} />
+          <FavoriteIcon {...favProp} />
           <ImageContainer>
               <CharacterImage src={`${thumbnail.path}.${thumbnail.extension}`} alt={name} />
               <ModifiedDate>Last Modified: {modified.toString()}</ModifiedDate>

@@ -1,13 +1,33 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { MarvelApi, currentPage, searchValue, searchOutput, targetCharacterId, targetCharacter, AllScrollData, userId, hasAcceptedUser, loggedInItem, loginStatus, totalDataCountState, movies, movieArrPatern } from './RecoilAtom';
-import { Character } from 'src/type/Character';
+import { 
+    MarvelApi,
+    currentPage, 
+    searchValue, 
+    searchOutput,
+    targetCharacterId, 
+    targetCharacter, 
+    loggedInItem, 
+    loginStatus, 
+    totalDataCountState, 
+    movies, 
+    movieArrPatern, 
+    FavChars, 
+    FavMovies, 
+    loggedInMovieItem 
+} from './RecoilAtom';
 import { Image, MarvelElement } from 'src/type/Common';
-import { ComicDataContainer } from 'src/type/Comic';
-import { ValidationHook, ServerHasErrorResponse, ServerSessionResponse, InitialDataResponse, ServerErrors } from 'src/type/app';
-import { useNavigate } from 'react-router-dom';
-import { get } from 'http';
+import { 
+    ValidationHook, 
+    ServerHasErrorResponse, 
+    ServerSessionResponse, 
+    InitialDataResponse, 
+    ServerErrors, 
+    ServerFavoriteResponse
+} from 'src/type/app';
+
 import axios from 'axios';
+import { FavoriteItemType } from 'src/type/enum';
 
 if(process.env.NODE_ENV === 'development') {
     console.log('これは開発環境用のビルドです。')
@@ -32,40 +52,50 @@ console.log("Request URI: ", process.env.REQUEST_URL);
 // useNavigateを適切に使うところから
 export const useHasEverLogin = () => {
     const setUserFavorite = useSetRecoilState(loggedInItem); // お気に入りデータを保持するatom
+    const setUserMovieFavorite = useSetRecoilState(loggedInMovieItem);
     const setLoginStatus = useSetRecoilState(loginStatus);
 
     useEffect(() => {
         
         const checkLoggin = async () => {
             try {
-                const response = await fetch(`${REQUEST_POINT}/first-ope`); // 初期起動時
-                const data: ServerResponse = await response.json(); // 一度だけ呼び出し
-
-                if (!response.ok) {
-                // ここで data を ServerHasErrorResponse として扱う
-                    if(isErrorResponse(data)) {
+                const response = await axios.get(`${REQUEST_POINT}/first-ope`); // 初期起動時
+                const data = response.data; // axios のレスポンスデータは response.data に格納されている
+        
+                if (response.status < 200 || response.status >= 300) {
+                    // ステータスコードが 200 番台でない場合にエラーハンドリングを行う
+                    if (isErrorResponse(data)) {
                         throw new Error(data.message || 'Network response was not ok');
                     }
-                } 
-                const sessionRes = data as ServerSessionResponse;
-                console.log("this users favorites are ", sessionRes.accountData);
-                setUserFavorite(sessionRes.accountData);
-
-                if(sessionRes.loggedIn) {
+                }
+        
+                const sessionRes: ServerSessionResponse = data;
+                console.log("this user's favorites are ", sessionRes.accountData);
+                const characterIds = sessionRes.accountData?.characterIds || [];
+                const movieIds = sessionRes.accountData?.movieIds || [];
+                setUserFavorite(characterIds);
+                setUserMovieFavorite(movieIds);
+        
+                if (sessionRes.loggedIn) {
                     console.log('I know this user!!!');
                     setLoginStatus(true);
-                    
                 } else {
                     console.log("I don't know this user!!!");
                     setLoginStatus(false);
                 }
-
-            // 成功した場合の処理。ここで data を ServerSessionResponse として扱う
+        
             } catch (error) {
                 // エラーハンドリング
                 console.error("warning!!", error);
+                if (axios.isAxiosError(error) && error.response) {
+                    const data = error.response.data;
+                    if (isErrorResponse(data)) {
+                        console.error("Server Error:", data.message || 'Network response was not ok');
+                    }
+                }
             }
         };
+        
             checkLoggin();
     }, []);
 }
@@ -146,25 +176,46 @@ export const useSearchOutput = () => {
     const setSearchResults = useSetRecoilState(searchOutput); // 検索結果を保持する配列
 
     useEffect(() => {
+        const source = axios.CancelToken.source();
+
         const fetchData = async () => {
             if (searchQuery) {
                 setSearchResults([]);
                 const jobId = setTimeout(async () => {
-                    const response = await fetch(`${REQUEST_POINT}/marvel-characters-search?name=${searchQuery}`);
-                    const searchedData = await response.json();
-                    console.log("取得した検索文字列たちは", searchedData);
-                    setSearchResults(searchedData);
+                    try {
+                        const response = await axios.get(`${REQUEST_POINT}/marvel-characters-search`, {
+                            params: { name: searchQuery },
+                            cancelToken: source.token,
+                        });
+                        const searchedData = response.data;
+                        console.log("取得した検索文字列たちは", searchedData);
+                        setSearchResults(searchedData);
+                    } catch (error) {
+                        if (axios.isCancel(error)) {
+                            console.log('Request canceled', error.message);
+                        } else {
+                            console.error('Fetch error: ', error);
+                        }
+                    }
                 }, waitTime);
 
-                return () => clearTimeout(jobId);
+                return () => {
+                    clearTimeout(jobId);
+                    source.cancel('Operation canceled by the user.');
+                };
             } else {
                 setSearchResults([]);
             }
         };
 
         fetchData();
-    }, [searchQuery]); // searchQueryの変更を検知して実施する。
-}
+
+        // クリーンアップ関数を返す
+        return () => {
+            source.cancel('Operation canceled by the user.');
+        };
+    }, [searchQuery, setSearchResults]); // searchQueryの変更を検知して実施する。
+};
 
 
 // 未キャッシュの詳細情報を表示するためにDBに取得しに行く
@@ -248,6 +299,7 @@ export const useInputValidation = (initialValue: string): ValidationHook => {
 export const useVerifyEnteredData = (setAuthError: (error: ServerErrors[]) => void) => {
     const [isLoading, setIsLoading] = useState(false);
     const setFavorites = useSetRecoilState(loggedInItem);
+    const setMovieFavorites = useSetRecoilState(loggedInMovieItem);
   
     const verifyData = useCallback(
         async (
@@ -275,21 +327,20 @@ export const useVerifyEnteredData = (setAuthError: (error: ServerErrors[]) => vo
                     console.error(`Error: ${response.status} - ${data.errors || data.message || 'An error occurred'}`);
                     
                     // データの errors プロパティをエラーハンドリングに使用
-                    if (data.errors) {
-                        setAuthError(data.errors);
-                    } else {
-                        setAuthError([{ type: 'server', value: '', msg: data.message || 'An error occurred', path: 'general', location: 'server' }]);
-                    }
+                   setAuthError([data]);
                     
                     return false;
                 }
-                
-                acceptUser(data.loggedIn);
-                setFavorites(data.accountData);
+
+                // アクセスが受け入れられた処理
+                const resData = data as ServerSessionResponse;
+                acceptUser(resData.loggedIn);
+                setFavorites(resData.accountData?.characterIds || []);
+                setMovieFavorites(resData.accountData?.movieIds || []);
                 console.log("ログイン自体は成功しましたか", data.loggedIn);
                 console.log("お気に入りは受け取りましたか", data.accountData);
 
-                return data.loggedIn;
+                return resData.loggedIn;
             } catch (error) {
                 console.error("キャッチされたエラー:", error);
                 setAuthError([{ type: 'server', value: '', msg: error.message, path: 'general', location: 'server' }]);
@@ -310,42 +361,97 @@ export const createURI = (
 }
 
 // お気に入りのuserId: characterid配列の組み合わせを格納するカスタムフック
-export const addToFavorites = async (userId: string, characterId: number) => {
+export const addToFavorites = async (
+    userId: string, 
+    targetId: number,
+    targetType: FavoriteItemType
+) => {
     try {
-        const response = await fetch(`${REQUEST_POINT}/addFavorites`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username: userId, characterId: characterId }),
-            credentials: 'include',
-        });
-
-        const resData: ServerHasErrorResponse = await response.json();
-        console.log(resData.message);
+        if(targetType === FavoriteItemType.Character) {
+            const response = await axios.post(
+                `${REQUEST_POINT}/addFavorites`,
+                {
+                    username: userId,
+                    characterId: targetId
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                }
+            );
+    
+            const resData: ServerHasErrorResponse = response.data;
+            console.log(resData.message);
+        } else if (targetType === FavoriteItemType.Movie) {
+            const response = await axios.post(
+                `${REQUEST_POINT}/addMovieFavorites`,
+                {
+                    username: userId,
+                    movieId: targetId
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                }
+            );
+    
+            const resData: ServerHasErrorResponse = response.data;
+            console.log(resData.message);
+        }
     } catch (error) {
         console.error(error);
     }
 
 }
 // お気に入りのuserId: characterid配列の組み合わせを削除するカスタムフック
-export const removeFromFavorites = async (userId: string, characterId: number) => {
+export const removeFromFavorites = async (
+    userId: string, 
+    targetId: number,
+    targetType: FavoriteItemType
+) => {
     try {
-        const response = await fetch(`${REQUEST_POINT}/removeFavorites`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ username: userId, characterId: characterId }),
-            credentials: 'include',
-        });
-
-        const resData: ServerHasErrorResponse = await response.json();
-        console.log(resData.message);
+        if(targetType === FavoriteItemType.Character) {
+            const response = await axios.post(
+                `${REQUEST_POINT}/removeFavorites`,
+                {
+                    username: userId,
+                    characterId: targetId
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                }
+            );
+    
+            const resData: ServerHasErrorResponse = response.data;
+            console.log(resData.message);
+        } else if (targetType === FavoriteItemType.Movie) {
+            const response = await axios.post(
+                `${REQUEST_POINT}/removeMovieFavorites`,
+                {
+                    username: userId,
+                    movieId: targetId
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    withCredentials: true
+                }
+            );
+    
+            const resData: ServerHasErrorResponse = response.data;
+            console.log(resData.message);
+        }
     } catch (error) {
         console.error(error);
     }
-
 }
 
 
@@ -408,3 +514,28 @@ export const useChangeArrayment = () => {
     return changeArrayment;
 }
 
+// お気に入り画面を開いたときに実データを取得する
+export const useGetFavorites = (characterIds: number[], movieIds: number[]) => {
+    const setCharFavsData = useSetRecoilState(FavChars);
+    const setMovieFavsData = useSetRecoilState(FavMovies);
+    const endpoint = 'get-favorite-data'; // エンドポイント
+
+    const getFavsData = useCallback(async () => {
+        try {
+            const response = await axios.post(`${REQUEST_POINT}/${endpoint}`, {
+                characterIds,
+                movieIds
+            }, {
+                withCredentials: true,  // 必要に応じてクッキーを送信
+            });
+
+            const resData = response.data as ServerFavoriteResponse;
+            setCharFavsData(resData.characters || []);
+            setMovieFavsData(resData.movies || []);
+        } catch (err) {
+            console.error(err);
+        }
+    }, [characterIds, movieIds])
+
+    return getFavsData;
+}

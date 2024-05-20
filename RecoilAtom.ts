@@ -70,7 +70,6 @@ export const userId = atom<string>({
 });
 
 // お気に入りたち
-
 export const hasAcceptedUser = atom<boolean>({
   key: "HasAcceptedUser",
   default: false
@@ -82,9 +81,26 @@ export const loginStatus = atom<boolean>({
   default: undefined
 });
 
-// お気に入りページで使用するデータ
-export const loggedInItem = atom<string[]>({
+// お気に入りの管理に使用するcharacterId
+export const loggedInItem = atom<number[]>({
   key: 'loggedInItem',
+  default: []
+});
+
+export const loggedInMovieItem = atom<number[]>({
+  key: 'loggedInMovieItem',
+  default: []
+});
+
+// お気に入りページで使用されるcharacterデータ
+export const FavChars = atom<Character[]>({
+  key: 'FavChars',
+  default: []
+});
+
+// お気に入りページで使用されるmovieデータ
+export const FavMovies = atom<MovieData[]>({
+  key: 'FavMovies',
   default: []
 });
 

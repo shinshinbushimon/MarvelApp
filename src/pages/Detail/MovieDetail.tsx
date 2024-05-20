@@ -1,9 +1,12 @@
-import { movies } from "RecoilAtom";
+import { loggedInMovieItem, movies } from "RecoilAtom";
 import React from "react";
 import { useLocation } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
 import { BackButton } from "src/atoms/Btn/BackButton";
+import { FavoriteProps } from "src/type/app";
+import { FavoriteIcon } from "src/atoms/Icon/BaseIcon";
+import { FavoriteItemType } from "src/type/enum";
 
 const DetailContainer = styled.div<{ background: string }>`
   background-image: url(${props => props.background});
@@ -42,15 +45,23 @@ const ReleaseDate = styled.span`
 
 export const MovieDetail: React.FC = () => {
     const { search } = useLocation();
+    const [favoriteMovies, setFavMovies] = useRecoilState(loggedInMovieItem);
     const query = new URLSearchParams(search);
     const movieId = Number(query.get("movieId"));
     console.log("movieId is ", movieId);
     const allMovieData = useRecoilValue(movies);
     const targetMovie = allMovieData.find(movie => movie.id === movieId);
     const { backdrop_path, original_title, overview, popularity, title, release_date} = targetMovie;
+    const favProp: FavoriteProps = {
+      targetId: movieId,
+      favorites: favoriteMovies,
+      setFavorites: setFavMovies,
+      targetItem: FavoriteItemType.Movie
+    }
     
     return (
         <DetailContainer background={`https://image.tmdb.org/t/p/original${backdrop_path}`}>
+            <FavoriteIcon {...favProp} />
             <Title>{title}</Title>
             <Subtitle>{original_title}</Subtitle>
             <Overview>{overview}</Overview>
