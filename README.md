@@ -75,4 +75,4 @@ Marvel作品が人気なものの、シリーズがたくさんあり時系列�
 
 You can download and view the presentation by clicking the link below:
 
-- [View Presentation](https://github.com/shinshinbushimon/MarvelApp/raw/master/MarvelApp/%E3%82%A2%E3%83%97%E3%83%AA%E8%AA%AC%E6%98%8E.pptx)
+- [View Presentation](https://github.com/shinshinbushimon/MarvelApp/raw/master/MarvelApp/アプリ説明.pptx)
