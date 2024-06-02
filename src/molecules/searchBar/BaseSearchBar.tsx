@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import { InputField } from 'src/atoms/Input/BaseInputField';
 import { BaseBtn } from 'src/atoms/Btn/BaseBtn';
 import { SearchSet } from 'src/type/app';
-import { searchValue } from 'RecoilAtom';
-import { useRecoilState } from 'recoil';
 
 const SearchBarContainer = styled.div`
   display: flex;
@@ -24,8 +22,7 @@ const SearchButton = styled(BaseBtn)`
   font-weight: bold; /* フォントを太く */
 `;
 
-// 外から値をもらうものでは？
-export const SearchBar: React.FC<SearchSet> = ({ value, onChange }) => {
+export const SearchBar: React.FC<SearchSet> = ({ value, onChange, placeholder }) => {
   const [searchState, setSearchState] = useState<boolean>(false);
 
   return (
@@ -33,7 +30,7 @@ export const SearchBar: React.FC<SearchSet> = ({ value, onChange }) => {
       {searchState && (
         <InputField
           type="text"
-          placeholder="キーワードを入力..."
+          placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />

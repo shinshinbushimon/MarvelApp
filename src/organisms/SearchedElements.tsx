@@ -25,7 +25,7 @@ export const SearchedElements: React.FC = () => {
         </div>
     );
 }
-// 基はCharacterItem
+
 export const SearchedMovieElements: React.FC<{ search: MovieData[] }> = ( { search } ) => {
     return (
         <div data-testid="searched-movie-elements">
@@ -46,13 +46,12 @@ export const SearchedMovieElements: React.FC<{ search: MovieData[] }> = ( { sear
 
 const CharacterItemContainer = styled.div`
   padding: 10px;
-  margin: 10px; /* アイテム間にマージンを設定 */
-  background-color: #ffffff; /* アイテムの背景色を白に */
-  border-radius: 4px; /* 角丸デザイン */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* より細かいシャドウ */
-  transition: transform 0.2s; /* ホバー時の動きを滑らかに */
-
+  margin: 10px; 
+  background-color: #ffffff;
+  border-radius: 4px; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+  transition: transform 0.2s;
   &:hover {
-    transform: scale(1.03); /* ホバー時に少し拡大 */
+    transform: scale(1.03); 
   }
 `;

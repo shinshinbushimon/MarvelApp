@@ -75,7 +75,6 @@ export class CharacterRepository implements DocumentDB{
     : Promise<Character[]> => {
         try {
             const result = await this.collection.find({ id: { $in: targetCharIds } }).toArray();
-            console.log('これはお気に入りアイテムとして取得したキャラクターの結果です', result);
             return result as Character[];
         } catch (error) {
             console.error("Error fetching favorite characters:", error);

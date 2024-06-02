@@ -1,6 +1,6 @@
 import React from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { MarvelApi, currentPage, movieArrPatern, movies } from "RecoilAtom";
+import { useRecoilValue } from "recoil";
+import { MarvelApi, currentPage, movies } from "RecoilAtom";
 import { CharacterItem, MovieItem  } from "src/molecules/CharacterItem";
 import { CustomLink } from "src/atoms/Link/BaseLink";
 import styled from "styled-components";
@@ -34,47 +34,43 @@ export const MovieList: React.FC = () => {
     const changeArrayment = useChangeArrayment();
     
     return (
-        <ListContainer data-testid="movie-list">
-            <Dropdown onChange={changeArrayment}/>
-            {moviesData ? 
-                moviesData.map(movieInfo => 
-                    <CustomLink key={movieInfo.id} to={`/movie/detail/?movieId=${movieInfo.id}`}>
-                        <MovieItem {...movieInfo} />
-                    </CustomLink>
-                    
-                )
-                :
-                (<p>データを取得しています。。。</p>)
-            }
-        </ListContainer>
+        <Container>
+            <DropdownWrapper>
+                <Dropdown onChange={changeArrayment}/>
+            </DropdownWrapper>
+            <ListContainer data-testid="movie-list">
+                {moviesData ? 
+                    moviesData.map(movieInfo => 
+                        <CustomLink key={movieInfo.id} to={`/movie/detail/?movieId=${movieInfo.id}`}>
+                            <MovieItem {...movieInfo} />
+                        </CustomLink>
+                    )
+                    :
+                    (<p>データを取得しています。。。</p>)
+                }
+            </ListContainer>
+        </Container>
     );
 }
 
-/*
-export const FavoriteList: React.FC = () => {
-    const apiData = useRecoilValue(MarvelApi);
-    const pageKey = useRecoilValue(currentPage);
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
 
+const DropdownWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-start; 
+  margin-bottom: 20px;
+`;
 
-    return (
-        <ListContainer data-testid="character-list">
-            {apiData[pageKey] ? 
-                apiData[pageKey].map(character => 
-                    <CustomLink key={character.id} to={`/character/detail/?characterId=${character.id}`}>
-                        <CharacterItem {...character} />
-                    </CustomLink>
-                    
-                )
-                :
-                (<p>データを取得しています。。。</p>)
-            }
-        </ListContainer>
-    );
-}
-*/
 const ListContainer = styled.div`
   display: flex;
-  flex-wrap: wrap; /* アイテムがコンテナの幅を超えたら次の行に折り返す */
-  justify-content: space-around; /* アイテム間に均等なスペースを設置 */
-  padding: 20px; /* リスト全体のパディング */
+  flex-wrap: wrap;
+  justify-content: space-around; 
+  padding: 20px; 
+  width: 100%;
 `;

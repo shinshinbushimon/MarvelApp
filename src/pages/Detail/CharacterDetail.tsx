@@ -1,112 +1,96 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { useLocation, useNavigate } from "react-router-dom";
-import { targetCharacterId, targetCharacter, AllScrollData, loggedInItem } from "RecoilAtom";
+import { useLocation } from "react-router-dom";
+import { targetCharacterId, targetCharacter, loggedInItem } from "RecoilAtom";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { BaseBtn } from "src/atoms/Btn/BaseBtn";
 import { InfinityScroll } from "src/organisms/Scroll/InfinityScroll";
-import { useDetailSearch } from "customHooks";
+import { useDetailSearch, useTranslationHandler } from "customHooks";
 import { FavoriteIcon } from "src/atoms/Icon/BaseIcon";
 import { BackButton } from "src/atoms/Btn/BackButton";
 import { FavoriteProps } from "src/type/app";
 import { FavoriteItemType } from "src/type/enum";
 
-// 各関連要素のコンポーネントに, className=.marvelItemと追記すること
-
 export const CharacterDetail: React.FC = () => {
-  
   const { search } = useLocation();
   const query = new URLSearchParams(search);
   const characterId = Number(query.get("characterId"));
   const [favoriteChar, setFavoriteChar] = useRecoilState(loggedInItem);
-
   const setId = useSetRecoilState(targetCharacterId);
   setId(characterId);
   const isLoading = useDetailSearch();
-  let nav = useNavigate();
-  
-  
   const mainData = useRecoilValue(targetCharacter);
-  if (isLoading) {
-    // ローディング中の場合はローディング表示
-    return <div>Loading...</div>;
+
+  const { monitoredDescription, translatedDescription } = useTranslationHandler(mainData?.description || '');
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+}, []);
+
+  if (isLoading || !mainData) {
+    return <div>データを取得しています...</div>;
   }
 
-  // データが存在しない場合はローディング表示
-  const { thumbnail, name, modified, description, resourceURI, urls } = mainData;
-  // ここでFavoriteItemTypeの値を確認する
-  console.log("FaviriteItemTypeの値は、", FavoriteItemType); // { 0: "Character", 1: "Movie", Character: 0, Movie: 1 }
-  console.log(FavoriteItemType.Character); // 1
-  
+  const { thumbnail, name, modified } = mainData;
+
   const favProp: FavoriteProps = {
     targetId: characterId,
     favorites: favoriteChar,
     setFavorites: setFavoriteChar,
     targetItem: FavoriteItemType.Character
-  }
+  };
 
-  // 省略: コンポーネントのレンダリング部分
-    return (
+  
 
-        <Container>
-          <FavoriteIcon {...favProp} />
-          <ImageContainer>
-              <CharacterImage src={`${thumbnail.path}.${thumbnail.extension}`} alt={name} />
-              <ModifiedDate>Last Modified: {modified.toString()}</ModifiedDate>
-          </ImageContainer>
-          <DetailContainer>
-              <CharacterName>{name}</CharacterName>
-              <CharacterDescription>{description}</CharacterDescription>
-              <MoreDetails href={resourceURI} target="_blank" rel="noopener noreferrer">More Details</MoreDetails>
-              <UrlsContainer>
-                {urls.map((url, index) => (
-                    <UrlLink key={index} href={url.url} target="_blank" rel="noopener noreferrer">{url.type}</UrlLink>
-                ))}
-              </UrlsContainer>
-              <ItemDataContainer>
-                 {/* コミックスデータをレンダリング */}
-                 <p>Comics: </p>
-                <InfinityScroll dataType="comics" />
-                {/* スクロール監視対象となる要素 */}
-              </ItemDataContainer>
-              <ItemDataContainer>
-                 {/* コミックスデータをレンダリング */}
-                 <p>Event: </p>
-                <InfinityScroll dataType="events" />
-                {/* スクロール監視対象となる要素 */}
-              </ItemDataContainer>
-              <ItemDataContainer>
-                 {/* コミックスデータをレンダリング */}
-                 <p>Series: </p>
-                <InfinityScroll dataType="series" />
-                {/* スクロール監視対象となる要素 */}
-              </ItemDataContainer>
-              <ItemDataContainer>
-                 {/* コミックスデータをレンダリング */}
-                 <p>Stories: </p>
-                <InfinityScroll dataType="stories" />
-                {/* スクロール監視対象となる要素 */}
-              </ItemDataContainer>
-              
-              <BackButton/>
-          </DetailContainer>
-        </Container>
+  return (
+    <Container>
+      <FavoriteIcon {...favProp} />
+      <ImageContainer>
+        <CharacterImage src={`${thumbnail.path}.${thumbnail.extension}`} alt={name} />
+        <ModifiedDate>最終更新日: {modified.toString()}</ModifiedDate>
+      </ImageContainer>
+      <DetailContainer>
+        <CharacterName>{name}</CharacterName>
+        <CharacterDescription>{translatedDescription || monitoredDescription}</CharacterDescription>
+        <ScrollSections>
+          <ItemDataContainer>
+            <p>コミックス:</p>
+            <StyledInfinityScrollContainer>
+              <InfinityScroll dataType="comics" />
+            </StyledInfinityScrollContainer>
+          </ItemDataContainer>
+          <ItemDataContainer>
+            <p>イベント:</p>
+            <StyledInfinityScrollContainer>
+              <InfinityScroll dataType="events" />
+            </StyledInfinityScrollContainer>
+          </ItemDataContainer>
+          <ItemDataContainer>
+            <p>シリーズ:</p>
+            <StyledInfinityScrollContainer>
+              <InfinityScroll dataType="series" />
+            </StyledInfinityScrollContainer>
+          </ItemDataContainer>
+        </ScrollSections>
+        <BackButton btnVal="キャラクターリストへ戻る" />
+      </DetailContainer>
+    </Container>
   );
 };
 
-
 const Container = styled.div`
   display: flex;
+  flex-wrap: wrap;
   margin: 20px;
 `;
 
 const ImageContainer = styled.div`
-  flex: 1;
+  width: 100%;
+  text-align: center;
 `;
 
 const CharacterImage = styled.img`
   width: 100%;
-  max-width: 400px;
+  max-width: 200px;
   height: auto;
 `;
 
@@ -116,7 +100,6 @@ const ModifiedDate = styled.p`
 `;
 
 const DetailContainer = styled.div`
-  flex: 2;
   margin-left: 20px;
 `;
 
@@ -124,20 +107,27 @@ const CharacterName = styled.h1``;
 
 const CharacterDescription = styled.p``;
 
-const MoreDetails = styled.a`
-  display: block;
-  margin-top: 10px;
-`;
-
-const UrlsContainer = styled.div`
-  margin-top: 10px;
+const ScrollSections = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 `;
 
 const ItemDataContainer = styled.div`
   margin-top: 10px;
 `;
 
-const UrlLink = styled.a`
-  display: inline-block;
-  margin-right: 10px;
+const StyledInfinityScrollContainer = styled.div`
+  border: 1px solid black;
+  padding: 10px;
+  max-width: 100%;
+  overflow-x: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
+  background-color: white;  
+  border-radius: 10px;  
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  
 `;

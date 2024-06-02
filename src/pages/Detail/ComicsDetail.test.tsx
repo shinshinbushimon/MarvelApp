@@ -36,7 +36,7 @@ describe('ComicsDetail Component', () => {
   it('renders comic details correctly', () => {
     render(
       <RecoilRoot initializeState={initializeState}>
-        <ComicsDetail index={0} />
+        <ComicsDetail />
       </RecoilRoot>
     );
 

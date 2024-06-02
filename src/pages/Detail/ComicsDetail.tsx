@@ -1,8 +1,10 @@
 import { AllScrollData } from "RecoilAtom";
-import React from "react";
+import React, { useEffect } from "react";
 import { useRecoilValue } from "recoil";
 import styled from 'styled-components';
-import { createImg } from "customHooks";
+import { createImg, useTranslationHandler } from "customHooks";
+import { useLocation } from "react-router-dom";
+import { BackButton } from "src/atoms/Btn/BackButton";
 
 const DetailContainer = styled.div`
     max-width: 800px;
@@ -18,57 +20,65 @@ const Title = styled.h1`
     text-align: center;
 `;
 
-const CharacterList = styled.ul`
-    list-style: none;
-    padding: 0;
-    max-height: 200px; // 一定の高さを超えたらスクロール
-    overflow-y: auto; // 縦方向にスクロールバーを表示
-`;
-
-const CharacterItem = styled.li`
-    margin: 10px 0;
-    color: #666;
-`;
-
 const Thumbnail = styled.img`
     display: block;
-    width: 100px; // サムネイルの幅を小さく設定
-    height: auto; // 高さは自動調整
+    width: 100px; 
+    height: auto; 
     margin: 20px auto;
     border-radius: 4px;
 `;
 
-const PriceInfo = styled.p`
-    color: #0077cc;
-    font-weight: bold;
-    margin: 5px 0;
+const Info = styled.p`
+  margin-top: 10px;
 `;
 
-export const ComicsDetail: React.FC<{index: number}> = ({ index }) => {
+const SectionTitle = styled.h2`
+  margin-top: 20px;
+`;
+
+const List = styled.ul`
+  list-style-type: none;
+  padding: 0;
+`;
+
+const ListItem = styled.li`
+  margin-bottom: 5px;
+`;
+
+export const ComicsDetail: React.FC = () => {
+    const { search } = useLocation();
+    const query = new URLSearchParams(search);
+    const index = Number(query.get("index"));
+
     const AllData = useRecoilValue(AllScrollData);
     const resourceType = 'comics';
 
     const comicData = AllData[resourceType][index];
-    const { title, thumbnail, prices, characters } = comicData; 
+    const { title, thumbnail, prices, characters, description } = comicData;
+    const { monitoredDescription, translatedDescription } = useTranslationHandler(description);
 
     const imageUrl = createImg(thumbnail);
     const printPrice = prices.find(price => price.type === 'printPrice')?.price || 0;
     const digitalPrice = prices.find(price => price.type === 'digitalPurchasePrice')?.price || 0;
 
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     return (
         <DetailContainer>
             <Title>{title}</Title>
-            <h2>登場キャラクター</h2>
-            <CharacterList>
+            <p>{translatedDescription || monitoredDescription}</p>
+            <Info>通常価格: ${printPrice}</Info>
+            <Info>デジタル価格: ${digitalPrice}</Info>
+            {imageUrl && <Thumbnail src={imageUrl} alt="Comic Thumbnail" />}
+            <SectionTitle>登場キャラクター</SectionTitle>
+            <List>
                 {characters.items.map((character, index) => (
-                    <CharacterItem key={index}>{character.name}</CharacterItem>
+                    <ListItem key={index}>{character.name}</ListItem>
                 ))}
-            </CharacterList>
-            <h2>サムネイル</h2>
-            <Thumbnail src={imageUrl} alt="Comic Thumbnail" />
-            <h2>価格情報</h2>
-            <PriceInfo>通常価格: ${printPrice}</PriceInfo>
-            <PriceInfo>デジタル価格: ${digitalPrice}</PriceInfo>
+            </List>
+            <BackButton btnVal="キャラクター画面へ戻る" />
         </DetailContainer>
     );
 };

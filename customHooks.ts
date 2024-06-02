@@ -14,9 +14,10 @@ import {
     movieArrPatern, 
     FavChars, 
     FavMovies, 
-    loggedInMovieItem 
+    loggedInMovieItem,
+    userId
 } from './RecoilAtom';
-import { Image, MarvelElement } from 'src/type/Common';
+import { Image } from 'src/type/Common';
 import { 
     ValidationHook, 
     ServerHasErrorResponse, 
@@ -29,14 +30,6 @@ import {
 import axios from 'axios';
 import { FavoriteItemType } from 'src/type/enum';
 
-if(process.env.NODE_ENV === 'development') {
-    console.log('これは開発環境用のビルドです。')
-} else if (process.env.NODE_ENV === 'production') {
-    console.log('これは本番環境用のビルドです。')
-} else {
-    console.log('これはどちらでもありません');
-}
-
 const waitTime = 500 // 検索記入欄で遅延させる時間
 type ServerResponse = (ServerHasErrorResponse | ServerSessionResponse);
 const REQUEST_POINT = process.env.REQUEST_URL;
@@ -46,46 +39,43 @@ function isErrorResponse(serverRes: ServerResponse): serverRes is ServerHasError
     return (serverRes as ServerHasErrorResponse).message !== undefined;
 }
 
-console.log("Request URI: ", process.env.REQUEST_URL);
-
 // 初期起動時に行う、ログインされたことがあるかと保存されているユーザ情報の確認
 // useNavigateを適切に使うところから
 export const useHasEverLogin = () => {
     const setUserFavorite = useSetRecoilState(loggedInItem); // お気に入りデータを保持するatom
     const setUserMovieFavorite = useSetRecoilState(loggedInMovieItem);
     const setLoginStatus = useSetRecoilState(loginStatus);
+    const setUserName = useSetRecoilState(userId);
 
     useEffect(() => {
         
         const checkLoggin = async () => {
             try {
                 const response = await axios.get(`${REQUEST_POINT}/first-ope`); // 初期起動時
-                const data = response.data; // axios のレスポンスデータは response.data に格納されている
+                const data = response.data;
         
                 if (response.status < 200 || response.status >= 300) {
-                    // ステータスコードが 200 番台でない場合にエラーハンドリングを行う
                     if (isErrorResponse(data)) {
                         throw new Error(data.message || 'Network response was not ok');
                     }
                 }
         
                 const sessionRes: ServerSessionResponse = data;
-                console.log("this user's favorites are ", sessionRes.accountData);
                 const characterIds = sessionRes.accountData?.characterIds || [];
                 const movieIds = sessionRes.accountData?.movieIds || [];
+                const username = sessionRes.username || 'user';
+
                 setUserFavorite(characterIds);
                 setUserMovieFavorite(movieIds);
+                setUserName(username);
         
                 if (sessionRes.loggedIn) {
-                    console.log('I know this user!!!');
                     setLoginStatus(true);
                 } else {
-                    console.log("I don't know this user!!!");
                     setLoginStatus(false);
                 }
         
             } catch (error) {
-                // エラーハンドリング
                 console.error("warning!!", error);
                 if (axios.isAxiosError(error) && error.response) {
                     const data = error.response.data;
@@ -101,15 +91,14 @@ export const useHasEverLogin = () => {
 }
 
 export const useInitialNumberOfData = () => {
-    const [totalDataCount, setTotalDataCount] = useRecoilState(totalDataCountState); // 総データ件数
+    const [totalDataCount, setTotalDataCount] = useRecoilState(totalDataCountState); 
 
     useEffect(() => {
-        // この関数はアプリケーションの初期起動時に一度だけ実行される
     const fetchTotalDataCount = async () => {
         try {
-          const response = await fetch(`${REQUEST_POINT}/marvel-characters/data-count`); // MongoDBから総データ件数を取得するエンドポイント
+          const response = await fetch(`${REQUEST_POINT}/marvel-characters/data-count`);
           const data: InitialDataResponse = await response.json();
-          setTotalDataCount(data.dataCount); // 取得した総データ件数を設定
+          setTotalDataCount(data.dataCount);
         } catch (error) {
           console.error('データ件数の取得に失敗しました', error);
         }
@@ -129,13 +118,11 @@ export const useFetchData = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            // pageDataに値が無ければとってくる
             if(!apiData[pageData]) {
                 try {
                     const response = await fetch(`${REQUEST_POINT}/marvel-characters?page=${pageData}`);
                     const data = await response.json();
 
-                    // dataのset, ちなみにオブジェクトがアロー関数内で複数行にわたる場合()でくくらなければならない
                     setApiData((prev) => ({
                         ...prev,
                         [pageData]: data
@@ -172,8 +159,8 @@ export const useFetchMoviesData = () => {
 
 // 検索結果表示のためにリクエストを依頼するカスタムフック
 export const useSearchOutput = () => {
-    const searchQuery = useRecoilValue(searchValue); // inputに紐づける検索値
-    const setSearchResults = useSetRecoilState(searchOutput); // 検索結果を保持する配列
+    const searchQuery = useRecoilValue(searchValue); 
+    const setSearchResults = useSetRecoilState(searchOutput); 
 
     useEffect(() => {
         const source = axios.CancelToken.source();
@@ -188,11 +175,10 @@ export const useSearchOutput = () => {
                             cancelToken: source.token,
                         });
                         const searchedData = response.data;
-                        console.log("取得した検索文字列たちは", searchedData);
                         setSearchResults(searchedData);
                     } catch (error) {
                         if (axios.isCancel(error)) {
-                            console.log('Request canceled', error.message);
+                            console.error('Request canceled', error.message);
                         } else {
                             console.error('Fetch error: ', error);
                         }
@@ -214,7 +200,7 @@ export const useSearchOutput = () => {
         return () => {
             source.cancel('Operation canceled by the user.');
         };
-    }, [searchQuery, setSearchResults]); // searchQueryの変更を検知して実施する。
+    }, [searchQuery, setSearchResults]); 
 };
 
 
@@ -225,15 +211,11 @@ export const useDetailSearch = () => {
     const watchingId = useRecoilValue(targetCharacterId);
     const setCharacterInfo = useSetRecoilState(targetCharacter);
     const [isLoading, setIsLoading] = useState(true);
-    console.log("current waching Id is ", watchingId);
 
     useEffect(() => {
-        console.log("Effectが実行されました");
         const getData = async () => {
             setIsLoading(true);
-            console.log("this place is useDetailSearch ,and the needed data is ", apiData);
             let cachedData = apiData[pageData]?.find(character => character.id === watchingId);
-            console.log("cachedData is ", cachedData);
 
             if (cachedData) {
                 setCharacterInfo(cachedData);
@@ -265,10 +247,8 @@ export const useInputValidation = (initialValue: string): ValidationHook => {
     const [value, setValue] = useState<string>(initialValue);
     const [error, setError] = useState<string>('');
     const [isTyping, setIsTyping] = useState<boolean>(false);
-    console.log("called out this customhooks");
 
     useEffect(() => {
-        console.log("called out this validation");
         if (!isTyping) return; 
         const timer = setTimeout(() => {
             if (value === '') {
@@ -303,30 +283,26 @@ export const useVerifyEnteredData = (setAuthError: (error: ServerErrors[]) => vo
   
     const verifyData = useCallback(
         async (
-            userId: string, 
+            userId: string,
             password: string, 
-            targetDomain: string, 
-            acceptUser: (output: boolean) => void
+            targetDomain: string,
+            isPermitted: boolean
         ): Promise<boolean> => {
             setIsLoading(true);
-            console.log("userId is: ", userId);
-            console.log("password is: ", password);
-            console.log("更新は反映されています。");
 
             try {
                 const response = await fetch(`${REQUEST_POINT}/${targetDomain}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: userId, password: password}),
+                    body: JSON.stringify({ 
+                        username: userId, 
+                        password: password,
+                        sessionPermission: isPermitted
+                    }),
                     credentials: 'include',
                 });
                 const data = await response.json();
-                if (!response.ok) {
-                    console.error("このレスポンスエラーは ", response);
-                    console.error("このエラーデータは ", data);
-                    console.error(`Error: ${response.status} - ${data.errors || data.message || 'An error occurred'}`);
-                    
-                    // データの errors プロパティをエラーハンドリングに使用
+                if (!response.ok) {                    
                    setAuthError([data]);
                     
                     return false;
@@ -334,12 +310,8 @@ export const useVerifyEnteredData = (setAuthError: (error: ServerErrors[]) => vo
 
                 // アクセスが受け入れられた処理
                 const resData = data as ServerSessionResponse;
-                acceptUser(resData.loggedIn);
                 setFavorites(resData.accountData?.characterIds || []);
                 setMovieFavorites(resData.accountData?.movieIds || []);
-                console.log("ログイン自体は成功しましたか", data.loggedIn);
-                console.log("お気に入りは受け取りましたか", data.accountData);
-
                 return resData.loggedIn;
             } catch (error) {
                 console.error("キャッチされたエラー:", error);
@@ -351,7 +323,7 @@ export const useVerifyEnteredData = (setAuthError: (error: ServerErrors[]) => vo
         }, [setAuthError, setFavorites]);
 
     return { verifyData, isLoading };
-};// serverpointを作成
+};
 export const createURI = (
     dataType: string, 
     characterId: number, 
@@ -382,8 +354,6 @@ export const addToFavorites = async (
                 }
             );
     
-            const resData: ServerHasErrorResponse = response.data;
-            console.log(resData.message);
         } else if (targetType === FavoriteItemType.Movie) {
             const response = await axios.post(
                 `${REQUEST_POINT}/addMovieFavorites`,
@@ -398,9 +368,6 @@ export const addToFavorites = async (
                     withCredentials: true
                 }
             );
-    
-            const resData: ServerHasErrorResponse = response.data;
-            console.log(resData.message);
         }
     } catch (error) {
         console.error(error);
@@ -430,7 +397,6 @@ export const removeFromFavorites = async (
             );
     
             const resData: ServerHasErrorResponse = response.data;
-            console.log(resData.message);
         } else if (targetType === FavoriteItemType.Movie) {
             const response = await axios.post(
                 `${REQUEST_POINT}/removeMovieFavorites`,
@@ -446,8 +412,6 @@ export const removeFromFavorites = async (
                 }
             );
     
-            const resData: ServerHasErrorResponse = response.data;
-            console.log(resData.message);
         }
     } catch (error) {
         console.error(error);
@@ -477,7 +441,6 @@ export const useChangeArrayment = () => {
     const setMovieArrPattern = useSetRecoilState(movieArrPatern);
 
     const changeArrayment = (pattern: string) => {
-        console.log("called changeArrayment");
         
         const copyAllMovie = [...AllMovie];
     
@@ -526,7 +489,7 @@ export const useGetFavorites = (characterIds: number[], movieIds: number[]) => {
                 characterIds,
                 movieIds
             }, {
-                withCredentials: true,  // 必要に応じてクッキーを送信
+                withCredentials: true,  
             });
 
             const resData = response.data as ServerFavoriteResponse;
@@ -539,3 +502,82 @@ export const useGetFavorites = (characterIds: number[], movieIds: number[]) => {
 
     return getFavsData;
 }
+
+export const useTranslate = () => {
+    const endpoint = 'marvel-translate';
+
+    const translateText = useCallback(async (targetText: string, targetLang: string, signal: AbortSignal) => {
+        try {
+            const response = await axios.post(`${REQUEST_POINT}/${endpoint}`, {
+                targetText,
+                targetLang
+            }, {
+                withCredentials: true,  
+                signal: signal 
+            });
+
+            const resData = response.data;
+            console.log("serverから返された翻訳値はこちらです", resData);
+            return resData.translatedText;
+        } catch (err) {
+            if (axios.isCancel(err)) {
+                console.log('翻訳リクエストがキャンセルされました');
+            } else {
+                console.error(err);
+            }
+            return targetText; 
+        }
+    }, []);
+
+    return translateText;
+};
+
+// 翻訳APIリクエストを管理するカスタムフックス
+export const useTranslationHandler = (description: string) => {
+    const translateFunc = useTranslate();
+    const [monitoredDescription, setMonitoredDescription] = useState<string>('');
+    const [translatedDescription, setTranslatedDescription] = useState<string>('');
+    const currentRequestRef = useRef<AbortController | null>(null);
+  
+    useEffect(() => {
+      const translate = async (description: string) => {
+        if (description && description.trim() !== '') {
+          const controller = new AbortController();
+          currentRequestRef.current = controller;
+  
+          try {
+            const translatedText = await translateFunc(description, 'JA', controller.signal);
+            if (!controller.signal.aborted) {
+              setTranslatedDescription(translatedText);
+            }
+          } catch (error) {
+            if (controller.signal.aborted) {
+              console.log('翻訳リクエストがキャンセルされました');
+            } else {
+              console.error(error);
+            }
+          } finally {
+            currentRequestRef.current = null;
+          }
+        } else {
+          setTranslatedDescription('');
+        }
+      };
+  
+      if (description) {
+        setMonitoredDescription(description);
+        translate(description);
+      } else {
+        setMonitoredDescription('');
+        setTranslatedDescription('');
+      }
+  
+      return () => {
+        if (currentRequestRef.current) {
+          currentRequestRef.current.abort();
+        }
+      };
+    }, [description, translateFunc]);
+  
+    return { monitoredDescription, translatedDescription };
+  };

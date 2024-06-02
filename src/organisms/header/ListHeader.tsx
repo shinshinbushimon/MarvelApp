@@ -7,7 +7,7 @@ export const ListHeader: React.FC<ListHeaderProps> = ({ onSearch }) => {
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        onSearch(searchQuery); // 
+        onSearch(searchQuery); 
     };
 
     return (

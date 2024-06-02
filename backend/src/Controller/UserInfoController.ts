@@ -42,7 +42,7 @@ export class UserInfoController {
         next: express.NextFunction
     ): Promise<void> => {
         try {
-            const { username, password } = req.body;
+            const { username, password, sessionPermission } = req.body;
             const existUser = await this.UserRepo.existPassWord(username, password);
             if (!existUser) {
                 res.status(401).json({
@@ -56,10 +56,8 @@ export class UserInfoController {
             }
             // ここでお気に入りアイテムを返すように
             const usersFavorites = await this.FavRepo.getFavoritesByUserId(username);
-            res.status(200).json({
-                loggedIn: true,
-                accountData: usersFavorites
-            });
+            res.locals.usersFavorites = usersFavorites;
+            res.locals.sessionPermission = sessionPermission;
             next();// session追加処理
         } catch (e) {
             logger.error(`Error checking if password exists: ${e.message}`);
@@ -80,9 +78,7 @@ export class UserInfoController {
         next: express.NextFunction
     ): Promise<void> => {
         try {
-            const { username, password } = req.body;
-            console.log('Received body:', req.body);
-            console.log('userId は', username);
+            const { username, password, sessionPermission } = req.body;
             const { existUserInfo, addUser } = this.UserRepo;
             if(await existUserInfo(username)) {
                 res.status(401).json({
@@ -95,10 +91,9 @@ export class UserInfoController {
                 return;
             }
             await addUser({ username, password });
-            res.status(200).json({ 
-                loggedIn: true,
-                accountData: []
-             });
+            res.locals.sessionPermission = sessionPermission;
+            res.locals.usersFavorites = [];
+            next();
         } catch (err) {
             logger.error(`Error adding user: ${err.message}`);
             res.status(500).json({

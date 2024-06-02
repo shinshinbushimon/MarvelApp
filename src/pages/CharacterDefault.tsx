@@ -22,9 +22,9 @@ export const CharacterDefault: React.FC = () => {
             const timeoutId = setTimeout(() => {
                 setIsTimedOut(true);
                 setIsLoading(false);
-            }, FetchWaitTime); // 3秒後にタイムアウト状態にする
+            }, FetchWaitTime); 
 
-            return () => clearTimeout(timeoutId); // クリーンアップタイムアウト
+            return () => clearTimeout(timeoutId); 
         } else {
             setIsLoading(false);
         }
@@ -35,6 +35,7 @@ export const CharacterDefault: React.FC = () => {
             setIsLoading(false);
         }
     }, [searchResults]);
+
 
     const renderContent = () => {
         if (!searchWord) {
@@ -50,7 +51,11 @@ export const CharacterDefault: React.FC = () => {
 
     return (
         <>
-            <SearchBar value={searchWord} onChange={setSearchWord} />
+            <SearchBar 
+                value={searchWord} 
+                onChange={setSearchWord} 
+                placeholder="キャラクターの英語名を入力してください 例）spiderman"
+            />
             {renderContent()}
             <BasicPagination />
         </>

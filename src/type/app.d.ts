@@ -59,7 +59,8 @@ export interface LabelProps {
 
 export interface LinkProps {
     to: string,
-    children: React.ReactNode
+    children: React.ReactNode,
+    className?: string
 }
 
 export interface SelectProps {
@@ -79,6 +80,7 @@ export interface ListHeaderProps {
 
 export interface SearchSet {
     value: string,
+    placeholder: string,
     onChange: (value: string) => void
 }
 
@@ -94,6 +96,7 @@ export interface ServerHasErrorResponse {
 }
 
 export interface ServerSessionResponse {
+    username?: string,
     loggedIn: boolean,
     accountData: { characterIds: number[], movieIds: number[] } 
 }
@@ -148,4 +151,23 @@ export interface FavoriteProps {
     favorites: number[], // 映画のかCharacterのお気に入り
     setFavorites: (favs: number[]) => void,
     targetItem: FavoriteItemType
+}
+
+interface Translation {
+    detected_source_language: string;
+    text: string;
+}
+  
+export interface DeepLResponse {
+    translations: Translation[];
+}
+
+export interface ToggleButtonProps {
+    isOn: boolean;
+    handleToggle: () => void;
+}
+
+export interface adjustPermission {
+    isPermitted: boolean,
+    setIsPermitted: (prev: boolean) => void
 }

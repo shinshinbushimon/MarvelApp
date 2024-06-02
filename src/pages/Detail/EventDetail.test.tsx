@@ -35,7 +35,7 @@ describe('EventDetail Component', () => {
   it('renders event details correctly', () => {
     render(
       <RecoilRoot initializeState={initializeState}>
-        <EventDetail index={0} />
+        <EventDetail />
       </RecoilRoot>
     );
 

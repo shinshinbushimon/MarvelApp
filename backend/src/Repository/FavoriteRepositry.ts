@@ -1,7 +1,6 @@
 import { Collection, Db } from "mongodb";
 import { DocumentDB, UserFavDocument, UserFavIds } from "../type";
 import { logger } from "../util/Logger";
-import { Character } from "../shared-types/Character";
 
 class FavoriteRepository implements DocumentDB {
     collectionName: string;
@@ -30,7 +29,6 @@ class FavoriteRepository implements DocumentDB {
                 { "userId": userId },
                 { projection: { characterIds: 1, movieIds: 1, _id: 0 } }
             );
-            console.log("favorite results are", result);
             if (!result) {
                 return {
                     characterIds: [],
@@ -56,19 +54,22 @@ class FavoriteRepository implements DocumentDB {
             // まず、ユーザーのドキュメントを取得してキャラクターIDが既に存在するか確認
             const userFavorites = await this.collection.findOne({ "userId": userId });
             
-            if (userFavorites && userFavorites.characterIds.includes(characterId)) {
+            if (userFavorites && Array.isArray(userFavorites.characterIds) && userFavorites.characterIds.includes(characterId)) {
                 logger.info("Character already in favorites");
                 return;
             }
+            
+            if (!userFavorites.characterIds) {
+                userFavorites.characterIds = [];
+            }
     
-            // キャラクターIDが存在しない場合に追加
             await this.collection.updateOne(
                 { "userId": userId },
                 { "$push": { "characterIds": characterId } },
                 { "upsert": true }
             );
     
-            console.log("Adding success");
+            logger.info('お気にいりキャラクター追加に成功');
         } catch (err) {
             console.error(err);
             throw new Error(`Database addFavorite error: ${err.message}`);
@@ -92,7 +93,7 @@ class FavoriteRepository implements DocumentDB {
                 { "upsert": true }
             );
     
-            console.log("Movie Item Adding success");
+            logger.info('お気に入り映画の追加に成功');
         } catch (err) {
             console.error(err);
             throw new Error(`Database addFavorite error: ${err.message}`);
@@ -107,7 +108,7 @@ class FavoriteRepository implements DocumentDB {
                 { "$pull": { "characterIds": characterId } },
             );
     
-            console.log("removing success");
+            logger.info('お気に入りキャラクターの削除に成功');
         } catch (err) {
             console.error(err);
             throw new Error(`Database addFavorite error: ${err.message}`);
@@ -122,7 +123,7 @@ class FavoriteRepository implements DocumentDB {
                 { "$pull": { "movieIds": movieId } },
             );
     
-            console.log("removing success");
+            logger.info('お気に入り映画の削除に成功');
         } catch (err) {
             console.error(err);
             throw new Error(`Database addFavorite error: ${err.message}`);

@@ -51,3 +51,12 @@ export interface MovieData {
     vote_average: number;
     vote_count: number;
 }  
+
+interface Translation {
+    detected_source_language: string;
+    text: string;
+}
+  
+export interface DeepLResponse {
+    translations: Translation[];
+}

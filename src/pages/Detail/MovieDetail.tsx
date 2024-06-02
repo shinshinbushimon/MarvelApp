@@ -1,5 +1,5 @@
 import { loggedInMovieItem, movies } from "RecoilAtom";
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import styled from "styled-components";
@@ -10,13 +10,21 @@ import { FavoriteItemType } from "src/type/enum";
 
 const DetailContainer = styled.div<{ background: string }>`
   background-image: url(${props => props.background});
-  background-size: contain;  // 画像全体がコンテナ内に収まるように調整
-  background-position: top center;  // 画像の上部を中心に配置
-  background-repeat: no-repeat;  // 画像の繰り返しを防ぐ
+  background-size: cover; 
+  background-position: center;  
+  background-repeat: no-repeat;  
   color: white;
   padding: 20px;
-  width: 100%;  // コンテナの幅を設定
-  height: 100vh;  // コンテナの高さを画面の高さに設定
+  width: 100%;
+  height: 100vh;
+`;
+
+const TitleContainer = styled.div`
+  background-color: rgba(0, 0, 0, 0.7);  
+  padding: 10px;
+  border-radius: 5px;
+  display: inline-block; 
+  margin-bottom: 20px;
 `;
 
 const Title = styled.h1`
@@ -28,8 +36,32 @@ const Subtitle = styled.h2`
   font-weight: normal;
 `;
 
+const OverviewContainer = styled.div<{ hasOverview: boolean }>`
+  background-color: rgba(0, 0, 0, 0.7);  
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 20px;
+  display: ${props => (props.hasOverview ? 'block' : 'none')}; 
+`;
+
 const Overview = styled.p`
-  font-size: 1.1rem;
+  font-size: 1.3rem;  
+  font-weight: bold;  
+`;
+
+const FavoriteIconContainer = styled.div`
+  background-color: rgba(0, 0, 0, 0.7);  
+  padding: 5px;
+  border-radius: 50%;  
+  display: inline-block;
+  margin-bottom: 20px;
+`;
+
+const PopularityReleaseDateContainer = styled.div`
+  background-color: rgba(0, 0, 0, 0.7); 
+  padding: 10px;
+  border-radius: 5px;
+  display: inline-block;
   margin-top: 20px;
 `;
 
@@ -44,35 +76,41 @@ const ReleaseDate = styled.span`
 `;
 
 export const MovieDetail: React.FC = () => {
-    const { search } = useLocation();
-    const [favoriteMovies, setFavMovies] = useRecoilState(loggedInMovieItem);
-    const query = new URLSearchParams(search);
-    const movieId = Number(query.get("movieId"));
-    console.log("movieId is ", movieId);
-    const allMovieData = useRecoilValue(movies);
-    const targetMovie = allMovieData.find(movie => movie.id === movieId);
-    const { backdrop_path, original_title, overview, popularity, title, release_date} = targetMovie;
-    const favProp: FavoriteProps = {
-      targetId: movieId,
-      favorites: favoriteMovies,
-      setFavorites: setFavMovies,
-      targetItem: FavoriteItemType.Movie
-    }
-    
-    return (
-        <DetailContainer background={`https://image.tmdb.org/t/p/original${backdrop_path}`}>
-            <FavoriteIcon {...favProp} />
-            <Title>{title}</Title>
-            <Subtitle>{original_title}</Subtitle>
-            <Overview>{overview}</Overview>
-            <div>
-                <Popularity>人気度: {popularity.toFixed(2)}</Popularity>
-                <ReleaseDate>公開日: {release_date}</ReleaseDate>
-            </div>
-            <BackButton />
-        </DetailContainer>
-    );
+  const { search } = useLocation();
+  const [favoriteMovies, setFavMovies] = useRecoilState(loggedInMovieItem);
+  const query = new URLSearchParams(search);
+  const movieId = Number(query.get("movieId"));
+  const allMovieData = useRecoilValue(movies);
+  const targetMovie = allMovieData.find(movie => movie.id === movieId);
+  const { backdrop_path, original_title, overview, popularity, title, release_date } = targetMovie;
+  const favProp: FavoriteProps = {
+    targetId: movieId,
+    favorites: favoriteMovies,
+    setFavorites: setFavMovies,
+    targetItem: FavoriteItemType.Movie
+  };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
-  
+  return (
+    <DetailContainer background={`https://image.tmdb.org/t/p/original${backdrop_path}`}>
+      <FavoriteIconContainer>
+        <FavoriteIcon {...favProp} />
+      </FavoriteIconContainer>
+      <TitleContainer>
+        <Title>{title}</Title>
+        <Subtitle>{original_title}</Subtitle>
+      </TitleContainer>
+      <OverviewContainer hasOverview={!!overview}>
+        <Overview>{overview}</Overview>
+      </OverviewContainer>
+      <PopularityReleaseDateContainer>
+        <Popularity>人気度: {popularity.toFixed(2)}</Popularity>
+        <ReleaseDate>公開日: {release_date}</ReleaseDate>
+      </PopularityReleaseDateContainer>
+      <BackButton btnVal="映画リストへ戻る" />
+    </DetailContainer>
+  );
 }

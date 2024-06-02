@@ -20,12 +20,19 @@ import { CharacterRoutes } from './Router/CharacterRouter';
 import { FavoriteRouter } from './Router/FavoriteRouter';
 import { MovieRouter } from './Router/MovieRouter';
 import { UserInfoRouter } from './Router/UserInfoRouter';
+import cors from 'cors';
+import TranslateController from './Controller/TranslateController';
 
 dotenv.config();
 
 const app: express.Express = express();
 app.use(express.json());
-app.use(cookieParser())
+app.use(cookieParser());
+app.use(cors({
+    origin: 'https://shinshinbushimon.cinemaverseproductions.com', 
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', 
+    credentials: true
+}));
 const port = process.env.PORT || 3001;
 
 // DBとコレクション一覧
@@ -58,6 +65,7 @@ async function connectMongo(): Promise<Db> {
 
 const marvelBase = 'http://gateway.marvel.com/v1/public/characters';
 const movieBase = 'https://api.themoviedb.org/3/movie';
+const deepLBase = 'https://api.deepl.com/v2/translate';
 const mySqlOpt: mySQLAuth = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -87,7 +95,10 @@ export const startMarvelApp = async (): Promise<express.Express> => {
         const userRepo = new UserInfoRepository(mySqlOpt, tableName);
         const userController = new UserInfoController(userRepo, favRepo);
 
-        app.use("/", CharacterRoutes(charController));
+        const DeepLTranslater = new ExternalAPIRepository(deepLBase);
+        const DeepLController = new TranslateController(DeepLTranslater);
+
+        app.use("/", CharacterRoutes(charController, DeepLController));
         app.use("/", FavoriteRouter(favController));
         app.use("/", MovieRouter(movieController));
         app.use("/", UserInfoRouter(sessController, userController));

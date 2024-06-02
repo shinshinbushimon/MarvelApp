@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { MovieList } from "src/organisms/List/ItemList";
 import { SearchBar } from "src/molecules/searchBar/BaseSearchBar";
-import { movies } from "RecoilAtom"; // Recoilのatomから適切にimportすることを確認
+import { movies } from "RecoilAtom"; 
 import { useRecoilValue } from "recoil";
 import { SearchedMovieElements } from "src/organisms/SearchedElements";
 import { hiraToKata, useFetchMoviesData } from "customHooks";
 
 export const MovieInfo: React.FC = () => {
-    useFetchMoviesData(); // 映画データの取得
+    useFetchMoviesData(); 
     const allMovieData = useRecoilValue(movies);
-    console.log("moviedatas are ", allMovieData);
     
-    // searchWordをuseStateでローカル管理
+    
     const [searchWord, setSearchWord] = useState('');
-    const [searchResults, setSearchResults] = useState([]); // 検索結果の状態もローカルで管理
+    const [searchResults, setSearchResults] = useState([]); 
 
-    // 検索ワードが変更されたときにフィルタリングを実行
     useEffect(() => {
         if (searchWord) {
             const filteredMovies = allMovieData.filter(movie =>
@@ -24,11 +22,10 @@ export const MovieInfo: React.FC = () => {
             setSearchResults(filteredMovies);
         }
     }, [searchWord, allMovieData]);
-    console.log("the number of searched movie are", searchResults.length);
 
     return (
         <>
-            <SearchBar value={searchWord} onChange={setSearchWord} />
+            <SearchBar value={searchWord} onChange={setSearchWord} placeholder="キーワードを入力..." />
             {searchWord && searchResults.length > 0 ? (
                 <SearchedMovieElements search={searchResults} />
             ) : searchWord && searchResults.length === 0 ? (

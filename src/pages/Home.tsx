@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useInputValidation, useVerifyEnteredData } from 'customHooks';
 import { Link, useNavigate } from 'react-router-dom';
-import { hasAcceptedUser, userId } from 'RecoilAtom';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { userId } from 'RecoilAtom';
+import { useSetRecoilState } from 'recoil';
 import { ServerErrors } from 'src/type/app';
+import { CookiePermission } from 'src/molecules/PermissionItem/CookiePermission';
 
 const Container = styled.div`
   display: flex;
@@ -38,25 +39,25 @@ const Button = styled.button<{ disbled?: boolean }>`
     background-color: ${({ disabled }) => (disabled ? '#d3d3d3' : '#0056b3')};
   }
 `;
-// signupボタンのルーティングや処理の実装
+
 export const SignUpPage = () => {
   const routePath = '/mainPage';
   const minLen = 5;
   const userIdElement = useInputValidation('');
   const passwordElement = useInputValidation('');
-  const [authError, setAuthError] = useState<ServerErrors[]>([]); // customhooksに渡す
+  const [authError, setAuthError] = useState<ServerErrors[]>([]);
   const nav = useNavigate();
   const setUserId = useSetRecoilState(userId);
-  const [useStatus, setUseStatus] = useRecoilState(hasAcceptedUser);
+  const [isPermitted, setIsPermitted] = useState(false);
 
-  const { verifyData, isLoading } = useVerifyEnteredData(setAuthError);  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
+  const { verifyData, isLoading } = useVerifyEnteredData(setAuthError);  
 
   const renderingAct = async () => {
     const isVerified = await verifyData(
         userIdElement.value, 
         passwordElement.value, 
-        'new-register', 
-        setUseStatus
+        'new-register',
+        isPermitted
     );
 
     if (isVerified) {
@@ -98,7 +99,8 @@ return (
         <Button onClick={renderingAct} disabled={isButtonDisabled(minLen)}>
           Sign up
         </Button>
-        <Button as={Link} to="/login">Already have an account? Log In</Button>
+        <Button as={Link} to="/login">既にアカウントをお持ちですか？ Log In</Button>
+        <CookiePermission isPermitted={isPermitted} setIsPermitted={setIsPermitted} />
     </Container>
 );
 };
@@ -112,43 +114,34 @@ export const LoginPage = () => {
   const [authError, setAuthError] = useState<ServerErrors[]>([]);
   const nav = useNavigate();
   const setUserId = useSetRecoilState(userId);
-  const [useStatus, acceptUser] = useRecoilState(hasAcceptedUser);
-  const loginDomain = 'login'
-  const { verifyData } = useVerifyEnteredData(setAuthError);  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
-
-
-  // handleRegisterではなく、server側にリクエスト投げて、jsonデータの取得カスタムフック
-  if(useStatus) {
-    setUserId(userIdElement.value);
-    nav(routePath);
-  }
+  const loginDomain = 'login';
+  const { verifyData, isLoading } = useVerifyEnteredData(setAuthError);
+  const [isPermitted, setIsPermitted] = useState(false);
 
   const renderingAct = async () => {
-    await verifyData(
+    const isVerified = await verifyData(
       userIdElement.value, 
       passwordElement.value, 
-      loginDomain, 
-      acceptUser);
-      
-      if(useStatus) {
-        setUserId(userIdElement.value);
-        nav(routePath);
-      }
+      loginDomain,
+      isPermitted
+    );
+    if (isVerified) {
+      setUserId(userIdElement.value);
+      nav(routePath);
     }
+  };
 
-    const renderErrorMessages = (path: string) => {
-      return authError
-          .filter(error => error.path === path)
-          .map((error, index) => <p key={index}>{error.msg}</p>);
-    };
+  const renderErrorMessages = (path: string) => {
+    return authError
+      .filter(error => error.path === path)
+      .map((error, index) => <p key={index}>{error.msg}</p>);
+  };
 
-    const isButtonDisabled = (minimumLen: number) => {
-      const HasUsernameProblem = (userIdElement.value.length < minimumLen) || userIdElement.error.length > 0;
-      const HasPasswordProblem = (passwordElement.value.length < minimumLen) || passwordElement.error.length > 0;
-      return HasUsernameProblem || HasPasswordProblem;
-    }
-    
-
+  const isButtonDisabled = (minimumLen: number) => {
+    const HasUsernameProblem = (userIdElement.value.length < minimumLen) || userIdElement.error.length > 0;
+    const HasPasswordProblem = (passwordElement.value.length < minimumLen) || passwordElement.error.length > 0;
+    return HasUsernameProblem || HasPasswordProblem;
+  };
 
   return (
     <Container>
@@ -170,9 +163,10 @@ export const LoginPage = () => {
       {passwordElement.error && <p>{passwordElement.error}</p>}
       {renderErrorMessages('password')}
       <Button onClick={renderingAct} disabled={isButtonDisabled(minLen)}>
-          Log in
-        </Button>
-        <Button as={Link} to="/signup">Already have an account? Sign Up</Button>
+        Log in
+      </Button>
+      <Button as={Link} to="/signup">アカウントを持っていませんか？ Sign Up</Button>
+      <CookiePermission isPermitted={isPermitted} setIsPermitted={setIsPermitted} />
     </Container>
   );
 };

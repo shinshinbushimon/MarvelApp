@@ -15,27 +15,32 @@ export class SessionController {
         next: express.NextFunction
     ): Promise<void> => {
         try {
-            const sessionId = req.cookies.sessionId;  // クッキーからセッションIDを取得
             const username = req.body.username;
-            
-            if (!sessionId) {
+            const sessionPermission = res.locals.sessionPermission;
+            if (sessionPermission) {
                 // セッションIDが存在しない場合は新しいセッションを作成
                 const newSessionId = await this.SessionRepo.createSession(username);  // 新しいセッションIDを作成するメソッドを呼び出す
                 res.cookie('sessionId', newSessionId, { 
-                    httpOnly: true,  // クライアントサイドのJavaScriptからクッキーにアクセスできないようにする
-                    secure: process.env.NODE_ENV === 'production',  // 本番環境ではセキュアなクッキーを使用
-                    maxAge: 24 * 60 * 60 * 1000  // クッキーの有効期限を1日に設定
+                    httpOnly: true,  
+                    secure: process.env.NODE_ENV === 'production', 
+                    maxAge: 24 * 60 * 60 * 1000, 
+                    path: '/',  
+                    sameSite: 'lax' 
                 });
-                res.status(201).json({ success: true, message: '新しいセッションが作成されました' });
-                return;
-            }
+                
+            } 
+            const usersFavorites = res.locals.usersFavorites; // ローカル変数から取得
+            res.status(200).json({
+                loggedIn: true,
+                accountData: usersFavorites || []
+            });
             
-            // セッションIDが存在する場合の処理を追加（例：既存のセッションを更新するなど）
-            res.status(200).json({ success: true, message: '既存のセッションが確認されました' });
-    
+            
         } catch (error) {
             logger.error("セッション追加でエラー発生: " + error.message);
-            res.status(500).json({ success: false, message: 'セッション追加に失敗しました' });
+            if (!res.headersSent) {
+                res.status(500).json({ success: false, message: 'セッション追加に失敗しました' });
+            }
             console.error(error);
             next(error);
         }
@@ -73,9 +78,9 @@ export class SessionController {
             // ここまで来たらセッションが確認できたということ
             const username = userSessionData.userId;
             const favoriteIds = await this.FavRepo.getFavoritesByUserId(username);
-            console.log("this user's favoriteIds are ", favoriteIds);
     
             res.json({
+                username: username,
                 loggedIn: true,
                 accountData: favoriteIds
             });

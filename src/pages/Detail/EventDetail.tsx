@@ -1,8 +1,10 @@
 import { AllScrollData } from "RecoilAtom";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRecoilValue } from "recoil";
 import styled from 'styled-components';
-import { createImg } from "customHooks";
+import { createImg, useTranslate, useTranslationHandler } from "customHooks";
+import { useLocation } from "react-router-dom";
+import { BackButton } from "src/atoms/Btn/BackButton";
 
 const DetailContainer = styled.div`
     max-width: 800px;
@@ -47,11 +49,18 @@ const ListItem = styled.li`
     color: #666;
 `;
 
-export const EventDetail: React.FC<{index: number}> = ({ index }) => {
-    const resourceType = 'events'
+const SectionTitle = styled.h2`
+  margin-top: 20px;
+`;
+
+export const EventDetail: React.FC = () => {
+    const { search } = useLocation();
+    const query = new URLSearchParams(search);
+    const index = Number(query.get("index"));
+    const resourceType = 'events';
     const AllData  = useRecoilValue(AllScrollData);
-    const eventData = AllData[resourceType][index]
-    
+    const eventData = AllData[resourceType][index];
+
     const {
         title,
         description,
@@ -65,38 +74,42 @@ export const EventDetail: React.FC<{index: number}> = ({ index }) => {
         next,
         previous
     } = eventData;
+    const { monitoredDescription, translatedDescription } = useTranslationHandler(description);
 
-    // 画像URLの生成
     const imageUrl = thumbnail ? createImg(thumbnail) : null;
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <DetailContainer>
             <Title>{title}</Title>
-            <Description>{description}</Description>
-            <DateInfo>Modified: {new Date(modified).toLocaleDateString()}</DateInfo>
-            <DateInfo>Start: {new Date(start).toLocaleDateString()}</DateInfo>
-            <DateInfo>End: {new Date(end).toLocaleDateString()}</DateInfo>
-            {imageUrl && <Thumbnail src={imageUrl} alt="Event Thumbnail" />}
-            <h2>Series</h2>
+            <Description>{translatedDescription || monitoredDescription}</Description>
+            <DateInfo>最終更新日: {new Date(modified).toLocaleDateString()}</DateInfo>
+            <DateInfo>開始日: {new Date(start).toLocaleDateString()}</DateInfo>
+            <DateInfo>終了日: {new Date(end).toLocaleDateString()}</DateInfo>
+            {imageUrl && <Thumbnail src={imageUrl} alt="イベントのサムネイル" />}
+            <SectionTitle>シリーズ</SectionTitle>
             <List>
                 {series.items.map((item, index) => (
                     <ListItem key={index}>{item.name}</ListItem>
                 ))}
             </List>
-            <h2>Characters</h2>
+            <SectionTitle>キャラクター</SectionTitle>
             <List>
                 {characters.items.map((character, index) => (
                     <ListItem key={index}>{character.name}</ListItem>
                 ))}
             </List>
-            <h2>Creators</h2>
+            <SectionTitle>クリエイター</SectionTitle>
             <List>
                 {creators.items.map((creator, index) => (
                     <ListItem key={index}>{creator.name}</ListItem>
                 ))}
             </List>
-            <DateInfo>Next Event: {next ? next.name : "N/A"}</DateInfo>
-            <DateInfo>Previous Event: {previous ? previous.name : "N/A"}</DateInfo>
+            <DateInfo>次のイベント: {next ? next.name : "N/A"}</DateInfo>
+            <DateInfo>前のイベント: {previous ? previous.name : "N/A"}</DateInfo>
+            <BackButton btnVal="キャラクター画面へ戻る"/>
         </DetailContainer>
     );
 };

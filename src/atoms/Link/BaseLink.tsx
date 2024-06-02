@@ -14,6 +14,6 @@ const SLink = styled(Link)`
     }
 `;
 
-export const CustomLink: React.FC<LinkProps> = ({to, children}) => (
-    <SLink to={to}>{children}</SLink>
+export const CustomLink: React.FC<LinkProps> = ({to, children, className}) => (
+    <SLink to={to} className={className}>{children}</SLink>
 );

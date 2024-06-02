@@ -2,30 +2,58 @@ import React from 'react';
 import Pagination from '@mui/material/Pagination';
 import Stack from '@mui/material/Stack';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { currentPage, totalDataCountState } from 'RecoilAtom'; // 仮定のcurrentPageアトム
+import { currentPage, totalDataCountState } from 'RecoilAtom';
 import { useInitialNumberOfData } from 'customHooks';
 
-export const BasicPagination: React.FC = () =>  {
-  useInitialNumberOfData(); // 一度だけ実行
-  const [page, setPage] = useRecoilState(currentPage); // currentPageのRecoilステート
+export const BasicPagination: React.FC = () => {
+  useInitialNumberOfData(); 
+  const [page, setPage] = useRecoilState(currentPage); 
   const totalDataCount = useRecoilValue(totalDataCountState);
-  const pageLimit = 20; // 一度に取得するデータ数
+  const pageLimit = 20; 
 
   const handleChange = (event, value) => {
     setPage(value);
-    // ここでAPIを呼び出してデータを取得するか、ページが変わるたびにデータを取得するカスタムフックをトリガーする
   };
 
   if (totalDataCount === undefined) {
-    // データがまだ取得されていない場合はローディング表示をするなどの処理
     return <div>Loading...</div>;
   }
   const totalPage = Math.ceil(totalDataCount / pageLimit);
 
   return (
-    <Stack spacing={2}>
-      <Pagination count={totalPage} page={page} onChange={handleChange} />
-      {/* 他のバリエーションを必要としない場合は、削除可能 */}
-    </Stack>
+    <StyledStack spacing={2}>
+      <StyledPagination count={totalPage} page={page} onChange={handleChange} />
+    </StyledStack>
   );
 }
+
+import styled from 'styled-components';
+
+const StyledStack = styled(Stack)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+`;
+
+const StyledPagination = styled(Pagination)`
+  .MuiPagination-ul {
+    justify-content: center;
+    li {
+      margin: 0 5px;
+    }
+    .Mui-selected {
+      background-color: #007bff;
+      color: white;
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+    button {
+      border-radius: 50%;
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+  }
+`;

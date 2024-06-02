@@ -37,7 +37,7 @@ describe('SeriesDetail Component', () => {
   it('renders series details correctly', () => {
     render(
       <RecoilRoot initializeState={initializeState}>
-        <SeriesDetail index={0} />
+        <SeriesDetail />
       </RecoilRoot>
     );
 

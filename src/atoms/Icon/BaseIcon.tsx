@@ -1,29 +1,22 @@
 // お気に入り機能で使用
+// お気に入り機能で使用
 import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AiOutlineStar, AiFillStar } from 'react-icons/ai';
 import { loggedInItem, userId } from 'RecoilAtom';
 import { addToFavorites, removeFromFavorites } from 'customHooks'; // API関数のダミー
 import { FavoriteProps } from 'src/type/app';
+import styled from 'styled-components';
 
 export const FavoriteIcon: React.FC<FavoriteProps> = ({ 
   targetId,
   favorites,
   setFavorites,
   targetItem
- }) => {
-
+}) => {
   const [isFavorited, setIsFavorited] = useState(favorites.includes(targetId));
-  console.log('お気に入りたちはこいつらです', favorites);
-  console.log('このキャラクターはお気に入りの一部ですか', favorites.includes(targetId));
-  console.log('そして結果はどのように解釈されていますか', isFavorited);
   const userIdNumber = useRecoilValue(userId);
 
-  const iconProps = {
-    'data-testid': isFavorited ? 'fill-star' : 'outline-star'
-  };
-
-  // コンポーネントのマウント時にお気に入り状態を確認
   useEffect(() => {
     setIsFavorited(favorites.includes(targetId));
   }, [favorites, targetId]);
@@ -44,8 +37,14 @@ export const FavoriteIcon: React.FC<FavoriteProps> = ({
   };
 
   return (
-    <div onClick={toggleFavorite} style={{ cursor: 'pointer' }}>
-      {isFavorited ? <AiFillStar color="yellow" {...iconProps}/> : <AiOutlineStar {...iconProps}/>}
-    </div>
+    <IconContainer onClick={toggleFavorite}>
+      {isFavorited ? <AiFillStar color="yellow" size={40}/> : <AiOutlineStar size={40}/>}
+    </IconContainer>
   );
 };
+
+const IconContainer = styled.div`
+  cursor: pointer;
+  display: inline-block;
+  font-size: 40px; // アイコンのサイズを設定
+`;
