@@ -71,8 +71,3 @@ Marvel作品が人気なものの、シリーズがたくさんあり時系列�
 - **AWS**
   - EC2インスタンス、RDSをセットアップしデプロイメントを実施しました。
  
-## プレゼンテーション
-
-You can download and view the presentation by clicking the link below:
-
-- [View Presentation](https://github.com/shinshinbushimon/MarvelApp/raw/master/MarvelApp/アプリ説明.pptx)
