@@ -70,3 +70,9 @@ Marvel作品が人気なものの、シリーズがたくさんあり時系列�
   - `docker-compose.yml`で本番疑似環境を作成したうえで必要なサービスを定義し、ローカル環境での開発を容易にします。
 - **AWS**
   - EC2インスタンス、RDSをセットアップしデプロイメントを実施しました。
+ 
+## プレゼンテーション
+
+You can download and view the presentation by clicking the link below:
+
+- [View Presentation](https://github.com/shinshinbushimon/MarvelApp/raw/master/MarvelApp/%E3%82%A2%E3%83%97%E3%83%AA%E8%AA%AC%E6%98%8E.pptx)
